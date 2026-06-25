@@ -266,10 +266,22 @@ function App() {
           })}
         </nav>
 
-        <div className="sidebar-mascot" aria-hidden="true">
-          <span className="spark spark-a" />
-          <span className="spark spark-b" />
-          <span className="sprite">◕‿◕</span>
+        <div className="sidebar-summary" aria-label="VKS L100 coverage">
+          <p className="eyebrow">L100 Coverage</p>
+          <div className="summary-grid">
+            <span>
+              <strong>{vksL100.modules.length}</strong>
+              <small>Modules</small>
+            </span>
+            <span>
+              <strong>{questionPool.length}</strong>
+              <small>Questions</small>
+            </span>
+          </div>
+          <div className="summary-mode">
+            <ClipboardList size={16} />
+            <span>{mode === "focus" ? "Focus session active" : "Learning mode"}</span>
+          </div>
         </div>
 
         <div className="sidebar-footer">
