@@ -276,7 +276,7 @@ textarea {
 }
 
 .content-grid.focus-mode {
-  grid-template-columns: minmax(0, 860px);
+  grid-template-columns: minmax(0, 1180px);
   justify-content: center;
 }
 
@@ -292,6 +292,15 @@ textarea {
 
 .content-grid.focus-mode .quiz-panel {
   min-height: 520px;
+}
+
+body.focus-mode:not(.focus-complete) .result-panel {
+  display: none;
+}
+
+body.focus-mode .workspace {
+  max-width: 1500px;
+  margin: 0 auto;
 }
 
 .result-panel {

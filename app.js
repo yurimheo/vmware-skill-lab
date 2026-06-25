@@ -133,6 +133,11 @@ function getIncorrectAnswers() {
   });
 }
 
+function isFocusComplete() {
+  const progress = getProgress();
+  return state.focusMode && progress.total > 0 && progress.completed === progress.total;
+}
+
 function escapeHtml(value) {
   return value
     .replaceAll("&", "&amp;")
@@ -436,6 +441,7 @@ function renderAnswerReview(incorrect, focusComplete) {
 
 function render() {
   document.body.classList.toggle("focus-mode", state.focusMode);
+  document.body.classList.toggle("focus-complete", isFocusComplete());
   els.contentGrid?.classList.toggle("focus-mode", state.focusMode);
   if (els.focusButton) els.focusButton.textContent = state.focusMode ? "개념 같이 보기" : "문제만 풀기";
   if (els.checkButton) els.checkButton.textContent = state.focusMode ? "답안 저장" : "정답 확인";
