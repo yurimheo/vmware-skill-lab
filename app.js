@@ -169,6 +169,13 @@ function getCorrectAnswerText(question) {
   return question.sample;
 }
 
+function getUserAnswerText(question, answer) {
+  if (!answer) return "미응답";
+  if (answer.skipped) return "건너뜀";
+  if (question.type === "choice") return question.options[answer.value] ?? "미응답";
+  return answer.value || "미응답";
+}
+
 function getIncorrectAnswers() {
   return getAllQuestions().filter(({ module, index }) => {
     const answer = state.answers[getQuestionKey(module.id, index)];
@@ -305,7 +312,7 @@ function renderQuestion() {
     });
   }
 
-  els.prevQuestionButton.disabled = state.moduleIndex === 0 && state.questionIndex === 0;
+  els.prevQuestionButton.disabled = !state.focusMode && state.moduleIndex === 0 && state.questionIndex === 0;
 }
 
 function checkAnswer() {
@@ -357,7 +364,7 @@ function gradeCurrentQuestion() {
 function getFeedbackText(question, saved) {
   if (!saved?.checked) {
     return state.focusMode
-      ? "답을 선택하거나 명령어를 입력한 뒤 답안 저장을 누르세요. 해설은 전체 풀이 완료 후 결과에서 확인합니다."
+      ? "답을 선택하거나 명령어를 입력한 뒤 다음을 누르세요. 모르면 건너뛰기로 넘길 수 있습니다."
       : "답을 선택하거나 명령어를 입력한 뒤 정답 확인을 누르세요.";
   }
 
@@ -394,6 +401,26 @@ function moveQuestion(delta) {
 
   saveState();
   render();
+}
+
+function skipQuestion() {
+  if (!state.focusMode) return;
+  const key = state.focusOrder[state.focusCursor];
+  state.answers[key] = {
+    value: null,
+    correct: false,
+    checked: true,
+    skipped: true,
+  };
+  saveState();
+
+  if (isLastQuestion()) {
+    render();
+    els.resultBody.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  moveQuestion(1);
 }
 
 function renderProgress() {
@@ -474,12 +501,15 @@ function renderAnswerReview(incorrect, focusComplete) {
     <div class="answer-review">
       <h4>오답 리뷰</h4>
       ${incorrect
-        .map(({ module, question }) => {
+        .map(({ module, question, index }) => {
+          const key = getQuestionKey(module.id, index);
           const answerText = getCorrectAnswerText(question);
+          const userAnswerText = getUserAnswerText(question, state.answers[key]);
           return `
             <div class="review-card">
               <span>${module.shortTitle}</span>
               <strong>${question.prompt}</strong>
+              <p>내 답: <code>${escapeHtml(userAnswerText)}</code></p>
               <p>정답: <code>${escapeHtml(answerText)}</code></p>
               <p>${question.explanation}</p>
             </div>
@@ -497,6 +527,7 @@ function render() {
   if (els.focusButton) els.focusButton.textContent = state.focusMode ? "개념 같이 보기" : "문제만 풀기";
   if (els.checkButton) els.checkButton.textContent = state.focusMode ? "답안 저장" : "정답 확인";
   if (els.nextQuestionButton) els.nextQuestionButton.textContent = state.focusMode && isLastQuestion() ? "제출" : "다음";
+  if (els.prevQuestionButton) els.prevQuestionButton.textContent = state.focusMode ? "건너뛰기" : "이전";
   renderModules();
   renderConcept();
   renderQuestion();
@@ -525,7 +556,13 @@ els.focusButton?.addEventListener("click", () => {
 });
 
 els.checkButton.addEventListener("click", checkAnswer);
-els.prevQuestionButton.addEventListener("click", () => moveQuestion(-1));
+els.prevQuestionButton.addEventListener("click", () => {
+  if (state.focusMode) {
+    skipQuestion();
+    return;
+  }
+  moveQuestion(-1);
+});
 els.nextQuestionButton.addEventListener("click", () => {
   if (state.focusMode) {
     checkAnswer();
