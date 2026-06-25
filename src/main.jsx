@@ -64,6 +64,7 @@ function App() {
   const [trackIndex, setTrackIndex] = useState(saved.trackIndex ?? 0);
   const selectedTrack = vksTracks[trackIndex] ?? vksTracks[0];
   const trackState = saved.tracks?.[selectedTrack.label] ?? {};
+  const [showGate, setShowGate] = useState(true);
   const [mode, setMode] = useState(saved.mode ?? "learn");
   const [moduleIndex, setModuleIndex] = useState(trackState.moduleIndex ?? 0);
   const [questionIndex, setQuestionIndex] = useState(trackState.questionIndex ?? 0);
@@ -112,6 +113,12 @@ function App() {
     setFocusOrder(savedForTrack.focusOrder ?? []);
     setFocusCursor(savedForTrack.focusCursor ?? 0);
     setAnswers(savedForTrack.answers ?? {});
+  }
+
+  function enterTrack(index) {
+    selectTrack(index);
+    setShowGate(false);
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
   function getFocusItem() {
@@ -251,6 +258,10 @@ function App() {
     .filter(({ score }) => score.total && Math.round((score.correct / score.total) * 100) < 70);
   const incorrect = questionPool.filter((item) => answers[item.key]?.checked && !answers[item.key]?.correct);
 
+  if (showGate) {
+    return <LaunchScreen saved={saved} selectedIndex={trackIndex} onSelect={enterTrack} />;
+  }
+
   return (
     <div className={`app-shell ${mode === "focus" ? "focus-mode" : ""}`}>
       <aside className="sidebar">
@@ -260,19 +271,6 @@ function App() {
             <h1>VMware Skill Lab</h1>
             <p>{selectedTrack.level}</p>
           </div>
-        </div>
-
-        <div className="level-tabs" aria-label="VKS levels">
-          {vksTracks.map((track, index) => (
-            <button
-              className={index === trackIndex ? "active" : ""}
-              key={track.label}
-              type="button"
-              onClick={() => selectTrack(index)}
-            >
-              {track.label}
-            </button>
-          ))}
         </div>
 
         <nav className="module-list" aria-label={`${selectedTrack.label} modules`}>
@@ -320,6 +318,9 @@ function App() {
             <ClipboardList size={16} />
             <span>{mode === "focus" ? "Focus session active" : "Learning mode"}</span>
           </div>
+          <button className="ghost-button compact-button" type="button" onClick={() => setShowGate(true)}>
+            레벨 다시 선택
+          </button>
         </div>
 
         <div className="sidebar-footer">
@@ -407,6 +408,96 @@ function App() {
         )}
       </main>
     </div>
+  );
+}
+
+function LaunchScreen({ saved, selectedIndex, onSelect }) {
+  const [solutionSelected, setSolutionSelected] = useState(false);
+
+  return (
+    <main className="launch-screen">
+      <section className="launch-hero" aria-label="VKS level selection">
+        <div className="launch-signal" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+
+        <div className="launch-title">
+          <span className="launch-mark">V</span>
+          <div>
+            <p className="eyebrow">VMware Skill Lab</p>
+            <h1>{solutionSelected ? "학습할 VKS 레벨을 선택하세요." : "학습할 VMware 솔루션을 선택하세요."}</h1>
+            <p>
+              {solutionSelected
+                ? "각 레벨은 개념 학습, 문제 풀이, 커맨드 실습, 결과 리포트로 구성됩니다."
+                : "현재 MVP는 VKS 트랙부터 시작합니다. 이후 vSphere, vSAN, NSX, VCF 트랙으로 확장할 수 있습니다."}
+            </p>
+          </div>
+        </div>
+
+        {!solutionSelected ? (
+          <div className="solution-grid">
+            <button className="solution-card selected" type="button" onClick={() => setSolutionSelected(true)}>
+              <span className="solution-icon">VKS</span>
+              <span className="profile-name">vSphere Kubernetes Service</span>
+              <span className="profile-description">
+                Kubernetes 기반 워크로드 운영을 위한 Foundation, Implementation, Advanced 학습 트랙입니다.
+              </span>
+              <span className="profile-stats">
+                <span>3 levels</span>
+                <span>{vksTracks.reduce((total, track) => total + track.modules.length, 0)} modules</span>
+              </span>
+              <span className="profile-footer">
+                <span>VKS 트랙 선택</span>
+                <ChevronRight size={18} />
+              </span>
+            </button>
+          </div>
+        ) : (
+          <>
+            <button className="back-link" type="button" onClick={() => setSolutionSelected(false)}>
+              솔루션 다시 선택
+            </button>
+            <div className="profile-grid">
+              {vksTracks.map((track, index) => {
+                const pool = allQuestions(track);
+                const savedAnswers = saved.tracks?.[track.label]?.answers ?? {};
+                const completed = pool.filter((item) => savedAnswers[item.key]?.checked).length;
+                const correct = pool.filter((item) => savedAnswers[item.key]?.correct).length;
+                const percent = pool.length ? Math.round((completed / pool.length) * 100) : 0;
+
+                return (
+                  <button
+                    className={`profile-card ${index === selectedIndex ? "selected" : ""}`}
+                    key={track.label}
+                    type="button"
+                    onClick={() => onSelect(index)}
+                  >
+                    <span className="profile-level">{track.label}</span>
+                    <span className="profile-name">{track.level.replace(`${track.label} `, "")}</span>
+                    <span className="profile-description">{track.description}</span>
+                    <span className="profile-stats">
+                      <span>{track.modules.length} modules</span>
+                      <span>{pool.length} questions</span>
+                    </span>
+                    <span className="profile-progress" aria-hidden="true">
+                      <span style={{ width: `${percent}%` }} />
+                    </span>
+                    <span className="profile-footer">
+                      <span>
+                        {completed}/{pool.length} completed · {correct} correct
+                      </span>
+                      <ChevronRight size={18} />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </section>
+    </main>
   );
 }
 
