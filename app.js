@@ -113,6 +113,22 @@ function getCurrentGlobalQuestionNumber() {
   return priorQuestions + state.questionIndex + 1;
 }
 
+function isLastQuestion() {
+  return getCurrentGlobalQuestionNumber() === getAllQuestions().length;
+}
+
+function getCorrectAnswerText(question) {
+  if (question.type === "choice") return question.options[question.answer];
+  return question.sample;
+}
+
+function getIncorrectAnswers() {
+  return getAllQuestions().filter(({ module, index }) => {
+    const answer = state.answers[getQuestionKey(module.id, index)];
+    return answer?.checked && !answer.correct;
+  });
+}
+
 function escapeHtml(value) {
   return value
     .replaceAll("&", "&amp;")
@@ -194,10 +210,8 @@ function renderQuestion() {
     `;
   }
 
-  const feedbackClass = saved?.checked ? (saved.correct ? " correct" : " wrong") : "";
-  const feedbackText = saved?.checked
-    ? `${saved.correct ? "정답입니다." : "다시 확인해보세요."} ${question.explanation}${question.sample ? ` 예: ${question.sample}` : ""}`
-    : "답을 선택하거나 명령어를 입력한 뒤 정답 확인을 누르세요.";
+  const feedbackClass = saved?.checked && !state.focusMode ? (saved.correct ? " correct" : " wrong") : "";
+  const feedbackText = getFeedbackText(question, saved);
 
   els.questionArea.innerHTML = `
     <div class="question-card">
@@ -267,7 +281,34 @@ function checkAnswer() {
     checked: true,
   };
   saveState();
+
+  if (state.focusMode) {
+    if (isLastQuestion()) {
+      render();
+      els.resultBody.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    moveQuestion(1);
+    return;
+  }
+
   render();
+}
+
+function getFeedbackText(question, saved) {
+  if (!saved?.checked) {
+    return state.focusMode
+      ? "답을 선택하거나 명령어를 입력한 뒤 답안 저장을 누르세요. 해설은 전체 풀이 완료 후 결과에서 확인합니다."
+      : "답을 선택하거나 명령어를 입력한 뒤 정답 확인을 누르세요.";
+  }
+
+  if (state.focusMode) {
+    return "답안이 저장되었습니다. 문제만 풀기 모드에서는 전체 풀이 완료 후 결과와 해설을 확인합니다.";
+  }
+
+  return `${saved.correct ? "정답입니다." : "다시 확인해보세요."} ${question.explanation}${
+    question.sample ? ` 예: ${question.sample}` : ""
+  }`;
 }
 
 function moveQuestion(delta) {
@@ -308,6 +349,8 @@ function renderResults() {
     return { module, moduleScore, modulePercent };
   });
   const weak = moduleRows.filter((row) => row.modulePercent < 70);
+  const incorrect = getIncorrectAnswers();
+  const focusComplete = progress.completed === progress.total;
 
   els.resultBody.innerHTML = `
     <div class="result-summary">
@@ -331,10 +374,52 @@ function renderResults() {
     <ul class="review-list">
       ${
         weak.length
-          ? weak.map(({ module }) => `<li>${module.title} 파트를 다시 복습하는 것이 좋습니다.</li>`).join("")
+          ? weak.map(({ module }) => `<li>${module.title} 부족</li>`).join("")
           : "<li>현재 기준으로 모든 파트가 안정권입니다. L200 학습으로 확장해도 좋습니다.</li>"
       }
     </ul>
+    ${renderAnswerReview(incorrect, focusComplete)}
+  `;
+}
+
+function renderAnswerReview(incorrect, focusComplete) {
+  if (!state.focusMode) return "";
+
+  if (!focusComplete) {
+    return `
+      <div class="answer-review">
+        <h4>오답 리뷰</h4>
+        <p>문제만 풀기 모드에서는 전체 문항을 완료한 뒤 오답 해설을 표시합니다.</p>
+      </div>
+    `;
+  }
+
+  if (!incorrect.length) {
+    return `
+      <div class="answer-review">
+        <h4>오답 리뷰</h4>
+        <p>오답이 없습니다. 지금 흐름이면 L100 기본 개념은 안정적입니다.</p>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="answer-review">
+      <h4>오답 리뷰</h4>
+      ${incorrect
+        .map(({ module, question }) => {
+          const answerText = getCorrectAnswerText(question);
+          return `
+            <div class="review-card">
+              <span>${module.shortTitle}</span>
+              <strong>${question.prompt}</strong>
+              <p>정답: <code>${escapeHtml(answerText)}</code></p>
+              <p>${question.explanation}</p>
+            </div>
+          `;
+        })
+        .join("")}
+    </div>
   `;
 }
 
@@ -342,6 +427,7 @@ function render() {
   document.body.classList.toggle("focus-mode", state.focusMode);
   els.contentGrid.classList.toggle("focus-mode", state.focusMode);
   els.focusButton.textContent = state.focusMode ? "개념 같이 보기" : "문제만 풀기";
+  els.checkButton.textContent = state.focusMode ? "답안 저장" : "정답 확인";
   renderModules();
   renderConcept();
   renderQuestion();
