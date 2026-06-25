@@ -261,30 +261,8 @@ function renderQuestion() {
 }
 
 function checkAnswer() {
-  const module = getCurrentModule();
-  const question = getCurrentQuestion();
-  const key = getQuestionKey(module.id, state.questionIndex);
-  const saved = state.answers[key];
-
-  if (!saved && question.type === "choice") return;
-
-  let correct = false;
-  let value = saved?.value ?? "";
-
-  if (question.type === "choice") {
-    correct = value === question.answer;
-  } else {
-    const input = document.querySelector("#commandInput");
-    value = normalizeCommand(input?.value ?? "");
-    correct = question.patterns.some((pattern) => new RegExp(pattern).test(value));
-  }
-
-  state.answers[key] = {
-    value,
-    correct,
-    checked: true,
-  };
-  saveState();
+  const didCheck = gradeCurrentQuestion();
+  if (!didCheck) return;
 
   if (state.focusMode) {
     if (isLastQuestion()) {
@@ -297,6 +275,35 @@ function checkAnswer() {
   }
 
   render();
+}
+
+function gradeCurrentQuestion() {
+  const module = getCurrentModule();
+  const question = getCurrentQuestion();
+  const key = getQuestionKey(module.id, state.questionIndex);
+  const saved = state.answers[key];
+
+  if (!saved && question.type === "choice") return false;
+
+  let correct = false;
+  let value = saved?.value ?? "";
+
+  if (question.type === "choice") {
+    correct = value === question.answer;
+  } else {
+    const input = document.querySelector("#commandInput");
+    value = normalizeCommand(input?.value ?? "");
+    if (!value) return false;
+    correct = question.patterns.some((pattern) => new RegExp(pattern).test(value));
+  }
+
+  state.answers[key] = {
+    value,
+    correct,
+    checked: true,
+  };
+  saveState();
+  return true;
 }
 
 function getFeedbackText(question, saved) {
@@ -432,6 +439,7 @@ function render() {
   els.contentGrid?.classList.toggle("focus-mode", state.focusMode);
   if (els.focusButton) els.focusButton.textContent = state.focusMode ? "개념 같이 보기" : "문제만 풀기";
   if (els.checkButton) els.checkButton.textContent = state.focusMode ? "답안 저장" : "정답 확인";
+  if (els.nextQuestionButton) els.nextQuestionButton.textContent = state.focusMode && isLastQuestion() ? "제출" : "다음";
   renderModules();
   renderConcept();
   renderQuestion();
@@ -457,7 +465,13 @@ els.focusButton?.addEventListener("click", () => {
 
 els.checkButton.addEventListener("click", checkAnswer);
 els.prevQuestionButton.addEventListener("click", () => moveQuestion(-1));
-els.nextQuestionButton.addEventListener("click", () => moveQuestion(1));
+els.nextQuestionButton.addEventListener("click", () => {
+  if (state.focusMode) {
+    checkAnswer();
+    return;
+  }
+  moveQuestion(1);
+});
 els.resetButton.addEventListener("click", () => {
   if (!confirm("저장된 진행률을 초기화할까요?")) return;
   state.moduleIndex = 0;

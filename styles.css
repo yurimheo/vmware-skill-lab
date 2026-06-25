@@ -449,6 +449,14 @@ code {
   margin-top: 18px;
 }
 
+.content-grid.focus-mode .quiz-actions {
+  grid-template-columns: 1fr 1fr;
+}
+
+.content-grid.focus-mode #checkButton {
+  display: none;
+}
+
 .primary-button,
 .secondary-button,
 .ghost-button {
