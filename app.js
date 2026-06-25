@@ -4,6 +4,8 @@ const state = {
   moduleIndex: 0,
   questionIndex: 0,
   focusMode: false,
+  focusOrder: [],
+  focusCursor: 0,
   answers: {},
 };
 
@@ -41,10 +43,12 @@ function getQuestionKey(moduleId, questionIndex) {
 }
 
 function getCurrentModule() {
+  if (state.focusMode) return getCurrentFocusItem().module;
   return window.VKS_L100.modules[state.moduleIndex];
 }
 
 function getCurrentQuestion() {
+  if (state.focusMode) return getCurrentFocusItem().question;
   return getCurrentModule().questions[state.questionIndex];
 }
 
@@ -55,6 +59,8 @@ function loadState() {
     state.moduleIndex = saved.moduleIndex ?? 0;
     state.questionIndex = saved.questionIndex ?? 0;
     state.focusMode = saved.focusMode ?? false;
+    state.focusOrder = saved.focusOrder ?? [];
+    state.focusCursor = saved.focusCursor ?? 0;
     state.answers = saved.answers ?? {};
   } catch {
     state.answers = {};
@@ -68,6 +74,8 @@ function saveState() {
       moduleIndex: state.moduleIndex,
       questionIndex: state.questionIndex,
       focusMode: state.focusMode,
+      focusOrder: state.focusOrder,
+      focusCursor: state.focusCursor,
       answers: state.answers,
     }),
   );
@@ -77,6 +85,39 @@ function getAllQuestions() {
   return window.VKS_L100.modules.flatMap((module) =>
     module.questions.map((question, index) => ({ module, question, index })),
   );
+}
+
+function getAllQuestionKeys() {
+  return getAllQuestions().map(({ module, index }) => getQuestionKey(module.id, index));
+}
+
+function getQuestionByKey(key) {
+  const [moduleId, indexText] = key.split(":");
+  const module = window.VKS_L100.modules.find((item) => item.id === moduleId);
+  const index = Number(indexText);
+  return { module, question: module.questions[index], index };
+}
+
+function shuffle(items) {
+  const next = [...items];
+  for (let index = next.length - 1; index > 0; index -= 1) {
+    const target = Math.floor(Math.random() * (index + 1));
+    [next[index], next[target]] = [next[target], next[index]];
+  }
+  return next;
+}
+
+function startFocusSession() {
+  state.focusMode = true;
+  state.focusOrder = shuffle(getAllQuestionKeys());
+  state.focusCursor = 0;
+  state.answers = {};
+}
+
+function getCurrentFocusItem() {
+  if (!state.focusOrder.length) startFocusSession();
+  const key = state.focusOrder[Math.min(state.focusCursor, state.focusOrder.length - 1)];
+  return getQuestionByKey(key);
 }
 
 function getScore() {
@@ -111,6 +152,7 @@ function getModuleScore(module) {
 }
 
 function getCurrentGlobalQuestionNumber() {
+  if (state.focusMode) return state.focusCursor + 1;
   const priorQuestions = window.VKS_L100.modules
     .slice(0, state.moduleIndex)
     .reduce((sum, module) => sum + module.questions.length, 0);
@@ -118,6 +160,7 @@ function getCurrentGlobalQuestionNumber() {
 }
 
 function isLastQuestion() {
+  if (state.focusMode) return state.focusCursor === state.focusOrder.length - 1;
   return getCurrentGlobalQuestionNumber() === getAllQuestions().length;
 }
 
@@ -193,10 +236,10 @@ function renderConcept() {
 function renderQuestion() {
   const module = getCurrentModule();
   const question = getCurrentQuestion();
-  const key = getQuestionKey(module.id, state.questionIndex);
+  const key = state.focusMode ? state.focusOrder[state.focusCursor] : getQuestionKey(module.id, state.questionIndex);
   const saved = state.answers[key];
   const globalNumber = getCurrentGlobalQuestionNumber();
-  const globalTotal = getAllQuestions().length;
+  const globalTotal = state.focusMode ? state.focusOrder.length : getAllQuestions().length;
 
   let inputHtml = "";
   if (question.type === "choice") {
@@ -285,7 +328,7 @@ function checkAnswer() {
 function gradeCurrentQuestion() {
   const module = getCurrentModule();
   const question = getCurrentQuestion();
-  const key = getQuestionKey(module.id, state.questionIndex);
+  const key = state.focusMode ? state.focusOrder[state.focusCursor] : getQuestionKey(module.id, state.questionIndex);
   const saved = state.answers[key];
 
   if (!saved && question.type === "choice") return false;
@@ -328,6 +371,14 @@ function getFeedbackText(question, saved) {
 }
 
 function moveQuestion(delta) {
+  if (state.focusMode) {
+    const nextCursor = state.focusCursor + delta;
+    if (nextCursor >= 0 && nextCursor < state.focusOrder.length) state.focusCursor = nextCursor;
+    saveState();
+    render();
+    return;
+  }
+
   const module = getCurrentModule();
   const nextQuestion = state.questionIndex + delta;
 
@@ -463,7 +514,11 @@ els.startButton.addEventListener("click", () => {
 });
 
 els.focusButton?.addEventListener("click", () => {
-  state.focusMode = !state.focusMode;
+  if (state.focusMode) {
+    state.focusMode = false;
+  } else {
+    startFocusSession();
+  }
   saveState();
   render();
   scrollToQuiz();
@@ -483,6 +538,8 @@ els.resetButton.addEventListener("click", () => {
   state.moduleIndex = 0;
   state.questionIndex = 0;
   state.focusMode = false;
+  state.focusOrder = [];
+  state.focusCursor = 0;
   state.answers = {};
   saveState();
   render();
