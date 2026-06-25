@@ -11,17 +11,17 @@ import {
   SkipForward,
   Terminal,
 } from "lucide-react";
-import { vksL100 } from "./data/vksL100";
+import { vksTracks } from "./data/vksTracks";
 import "./styles.css";
 
-const STORAGE_KEY = "vmware-skill-lab:vks-l100-react";
+const STORAGE_KEY = "vmware-skill-lab:vks-react";
 
 function questionKey(moduleId, index) {
   return `${moduleId}:${index}`;
 }
 
-function allQuestions() {
-  return vksL100.modules.flatMap((module) =>
+function allQuestions(track) {
+  return track.modules.flatMap((module) =>
     module.questions.map((question, index) => ({ module, question, index, key: questionKey(module.id, index) })),
   );
 }
@@ -61,33 +61,58 @@ function loadState() {
 
 function App() {
   const saved = useMemo(loadState, []);
+  const [trackIndex, setTrackIndex] = useState(saved.trackIndex ?? 0);
+  const selectedTrack = vksTracks[trackIndex] ?? vksTracks[0];
+  const trackState = saved.tracks?.[selectedTrack.label] ?? {};
   const [mode, setMode] = useState(saved.mode ?? "learn");
-  const [moduleIndex, setModuleIndex] = useState(saved.moduleIndex ?? 0);
-  const [questionIndex, setQuestionIndex] = useState(saved.questionIndex ?? 0);
-  const [focusOrder, setFocusOrder] = useState(saved.focusOrder ?? []);
-  const [focusCursor, setFocusCursor] = useState(saved.focusCursor ?? 0);
-  const [answers, setAnswers] = useState(saved.answers ?? {});
+  const [moduleIndex, setModuleIndex] = useState(trackState.moduleIndex ?? 0);
+  const [questionIndex, setQuestionIndex] = useState(trackState.questionIndex ?? 0);
+  const [focusOrder, setFocusOrder] = useState(trackState.focusOrder ?? []);
+  const [focusCursor, setFocusCursor] = useState(trackState.focusCursor ?? 0);
+  const [answers, setAnswers] = useState(trackState.answers ?? {});
   const [cardTick, setCardTick] = useState(0);
 
-  const questionPool = useMemo(allQuestions, []);
+  const questionPool = useMemo(() => allQuestions(selectedTrack), [selectedTrack]);
   const currentFocusItem = mode === "focus" ? getFocusItem() : null;
-  const currentModule = mode === "focus" ? currentFocusItem.module : vksL100.modules[moduleIndex];
-  const currentQuestion = mode === "focus" ? currentFocusItem.question : currentModule.questions[questionIndex];
-  const currentKey = mode === "focus" ? currentFocusItem.key : questionKey(currentModule.id, questionIndex);
+  const currentModule = mode === "focus" ? currentFocusItem.module : selectedTrack.modules[moduleIndex] ?? selectedTrack.modules[0];
+  const safeQuestionIndex = Math.min(questionIndex, currentModule.questions.length - 1);
+  const currentQuestion = mode === "focus" ? currentFocusItem.question : currentModule.questions[safeQuestionIndex];
+  const currentKey = mode === "focus" ? currentFocusItem.key : questionKey(currentModule.id, safeQuestionIndex);
   const currentAnswer = answers[currentKey];
   const focusComplete = mode === "focus" && getProgress().completed === questionPool.length;
   const isLastFocusQuestion = mode === "focus" && focusCursor === focusOrder.length - 1;
 
   useEffect(() => {
+    const previous = loadState();
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ mode, moduleIndex, questionIndex, focusOrder, focusCursor, answers }),
+      JSON.stringify({
+        ...previous,
+        mode,
+        trackIndex,
+        tracks: {
+          ...(previous.tracks ?? {}),
+          [selectedTrack.label]: { moduleIndex, questionIndex, focusOrder, focusCursor, answers },
+        },
+      }),
     );
-  }, [mode, moduleIndex, questionIndex, focusOrder, focusCursor, answers]);
+  }, [mode, trackIndex, selectedTrack.label, moduleIndex, questionIndex, focusOrder, focusCursor, answers]);
 
   useEffect(() => {
     setCardTick((value) => value + 1);
   }, [mode, moduleIndex, questionIndex, focusCursor]);
+
+  function selectTrack(index) {
+    const nextTrack = vksTracks[index] ?? vksTracks[0];
+    const savedForTrack = loadState().tracks?.[nextTrack.label] ?? {};
+    setTrackIndex(index);
+    setMode("learn");
+    setModuleIndex(savedForTrack.moduleIndex ?? 0);
+    setQuestionIndex(savedForTrack.questionIndex ?? 0);
+    setFocusOrder(savedForTrack.focusOrder ?? []);
+    setFocusCursor(savedForTrack.focusCursor ?? 0);
+    setAnswers(savedForTrack.answers ?? {});
+  }
 
   function getFocusItem() {
     const order = focusOrder.length ? focusOrder : questionPool.map((item) => item.key);
@@ -175,7 +200,7 @@ function App() {
 
     if (questionIndex < currentModule.questions.length - 1) {
       setQuestionIndex((value) => value + 1);
-    } else if (moduleIndex < vksL100.modules.length - 1) {
+    } else if (moduleIndex < selectedTrack.modules.length - 1) {
       setModuleIndex((value) => value + 1);
       setQuestionIndex(0);
     }
@@ -187,7 +212,7 @@ function App() {
     else if (moduleIndex > 0) {
       const prevModuleIndex = moduleIndex - 1;
       setModuleIndex(prevModuleIndex);
-      setQuestionIndex(vksL100.modules[prevModuleIndex].questions.length - 1);
+      setQuestionIndex(selectedTrack.modules[prevModuleIndex].questions.length - 1);
     }
   }
 
@@ -221,7 +246,7 @@ function App() {
   const progress = getProgress();
   const progressPercent = progress.total ? Math.round((progress.completed / progress.total) * 100) : 0;
   const scorePercent = score.total ? Math.round((score.correct / score.total) * 100) : 0;
-  const weakModules = vksL100.modules
+  const weakModules = selectedTrack.modules
     .map((module) => ({ module, score: getModuleScore(module) }))
     .filter(({ score }) => score.total && Math.round((score.correct / score.total) * 100) < 70);
   const incorrect = questionPool.filter((item) => answers[item.key]?.checked && !answers[item.key]?.correct);
@@ -233,12 +258,25 @@ function App() {
           <span className="brand-mark">V</span>
           <div>
             <h1>VMware Skill Lab</h1>
-            <p>VKS L100 Foundation</p>
+            <p>{selectedTrack.level}</p>
           </div>
         </div>
 
-        <nav className="module-list" aria-label="VKS L100 modules">
-          {vksL100.modules.map((module, index) => {
+        <div className="level-tabs" aria-label="VKS levels">
+          {vksTracks.map((track, index) => (
+            <button
+              className={index === trackIndex ? "active" : ""}
+              key={track.label}
+              type="button"
+              onClick={() => selectTrack(index)}
+            >
+              {track.label}
+            </button>
+          ))}
+        </div>
+
+        <nav className="module-list" aria-label={`${selectedTrack.label} modules`}>
+          {selectedTrack.modules.map((module, index) => {
             const moduleScore = getModuleScore(module);
             return (
               <button
@@ -266,11 +304,11 @@ function App() {
           })}
         </nav>
 
-        <div className="sidebar-summary" aria-label="VKS L100 coverage">
-          <p className="eyebrow">L100 Coverage</p>
+        <div className="sidebar-summary" aria-label={`${selectedTrack.label} coverage`}>
+          <p className="eyebrow">{selectedTrack.label} Coverage</p>
           <div className="summary-grid">
             <span>
-              <strong>{vksL100.modules.length}</strong>
+              <strong>{selectedTrack.modules.length}</strong>
               <small>Modules</small>
             </span>
             <span>
@@ -302,7 +340,7 @@ function App() {
         <header className="topbar">
           <div>
             <p className="eyebrow">Interactive VMware Learning</p>
-            <h2>VKS L100 Foundation</h2>
+            <h2>{selectedTrack.title}</h2>
           </div>
           <div className="score-pill">
             <span>정답</span>
@@ -315,10 +353,10 @@ function App() {
         <section className="hero-panel">
           <div>
             <p className="eyebrow">MVP Scope</p>
-            <h3>VKS L100을 퀴즈와 커맨드 실습으로 점검합니다.</h3>
+            <h3>{selectedTrack.label}을 퀴즈와 커맨드 실습으로 점검합니다.</h3>
             <p>
-              Obsidian의 VKS L100 개념정리와 스킬셋 트래커를 기반으로 만든 개인 학습용 사이트입니다.
-              문제 순서는 Focus 모드에서 매번 섞이며, 결과에서 부족한 영역과 오답 리뷰를 확인합니다.
+              {selectedTrack.description} 문제 순서는 Focus 모드에서 매번 섞이며,
+              결과에서 부족한 영역과 오답 리뷰를 확인합니다.
             </p>
           </div>
           <div className="hero-actions">
@@ -342,7 +380,7 @@ function App() {
             module={currentModule}
             question={currentQuestion}
             answer={currentAnswer}
-            currentNumber={mode === "focus" ? focusCursor + 1 : questionIndex + 1}
+            currentNumber={mode === "focus" ? focusCursor + 1 : safeQuestionIndex + 1}
             totalNumber={mode === "focus" ? focusOrder.length : currentModule.questions.length}
             onChoice={updateChoice}
             onCommand={updateCommand}
@@ -350,6 +388,7 @@ function App() {
             onPrev={previous}
             onNext={next}
             isLast={isLastFocusQuestion}
+            trackLabel={selectedTrack.label}
           />
         </section>
 
@@ -359,7 +398,7 @@ function App() {
             scorePercent={scorePercent}
             score={score}
             progressPercent={progressPercent}
-            modules={vksL100.modules}
+            modules={selectedTrack.modules}
             getModuleScore={getModuleScore}
             weakModules={weakModules}
             incorrect={incorrect}
@@ -407,6 +446,7 @@ function PracticePanel({
   onPrev,
   onNext,
   isLast,
+  trackLabel,
 }) {
   const feedback = getFeedback(mode, question, answer);
 
@@ -423,7 +463,7 @@ function PracticePanel({
       </div>
 
       <div className="question-meta">
-        <span>{mode === "focus" ? "L100 Focus Mode" : module.shortTitle}</span>
+        <span>{mode === "focus" ? `${trackLabel} Focus Mode` : module.shortTitle}</span>
       </div>
       <p className="question-text">{question.prompt}</p>
 
@@ -537,7 +577,7 @@ function ResultPanel({ mode, scorePercent, score, progressPercent, modules, getM
         {weakModules.length ? (
           weakModules.map(({ module }) => <li key={module.id}>{module.title} 부족</li>)
         ) : (
-          <li>현재 기준으로 모든 파트가 안정권입니다. L200 학습으로 확장해도 좋습니다.</li>
+          <li>현재 기준으로 모든 파트가 안정권입니다. 다음 레벨 학습으로 확장해도 좋습니다.</li>
         )}
       </ul>
 

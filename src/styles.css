@@ -102,6 +102,30 @@ button:hover {
   font-size: 13px;
 }
 
+.level-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.level-tabs button {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.level-tabs button:hover,
+.level-tabs button.active {
+  border-color: var(--blue);
+  background: #eff6ff;
+  color: var(--blue-dark);
+}
+
 .module-list {
   display: flex;
   flex: 1;

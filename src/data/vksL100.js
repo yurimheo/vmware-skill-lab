@@ -1,6 +1,9 @@
 export const vksL100 = {
   track: "VKS",
   level: "L100 Foundation",
+  label: "L100",
+  title: "VKS L100 Foundation",
+  description: "Kubernetes 기본 개념, VKS 구조, CNI/CSI, 라이선스와 kubectl 기초를 다룹니다.",
   modules: [
     {
       id: "k8s-core",
