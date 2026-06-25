@@ -28,6 +28,10 @@ const els = {
   resultBody: document.querySelector("#resultBody"),
 };
 
+function scrollToQuiz() {
+  document.querySelector(".quiz-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function normalizeCommand(value) {
   return value.trim().replace(/\s+/g, " ");
 }
@@ -425,9 +429,9 @@ function renderAnswerReview(incorrect, focusComplete) {
 
 function render() {
   document.body.classList.toggle("focus-mode", state.focusMode);
-  els.contentGrid.classList.toggle("focus-mode", state.focusMode);
-  els.focusButton.textContent = state.focusMode ? "개념 같이 보기" : "문제만 풀기";
-  els.checkButton.textContent = state.focusMode ? "답안 저장" : "정답 확인";
+  els.contentGrid?.classList.toggle("focus-mode", state.focusMode);
+  if (els.focusButton) els.focusButton.textContent = state.focusMode ? "개념 같이 보기" : "문제만 풀기";
+  if (els.checkButton) els.checkButton.textContent = state.focusMode ? "답안 저장" : "정답 확인";
   renderModules();
   renderConcept();
   renderQuestion();
@@ -441,14 +445,14 @@ els.startButton.addEventListener("click", () => {
   state.questionIndex = 0;
   saveState();
   render();
-  els.questionArea.scrollIntoView({ behavior: "smooth", block: "center" });
+  scrollToQuiz();
 });
 
-els.focusButton.addEventListener("click", () => {
+els.focusButton?.addEventListener("click", () => {
   state.focusMode = !state.focusMode;
   saveState();
   render();
-  els.questionArea.scrollIntoView({ behavior: "smooth", block: "center" });
+  scrollToQuiz();
 });
 
 els.checkButton.addEventListener("click", checkAnswer);
