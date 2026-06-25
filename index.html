@@ -4,95 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VMware Skill Lab</title>
-    <link rel="stylesheet" href="./styles.css?v=20260625-5" />
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="sidebar">
-        <div class="brand">
-          <span class="brand-mark">V</span>
-          <div>
-            <h1>VMware Skill Lab</h1>
-            <p>VKS L100 Foundation</p>
-          </div>
-        </div>
-
-        <nav class="module-list" id="moduleList" aria-label="VKS L100 modules"></nav>
-
-        <div class="sidebar-footer">
-          <div class="progress-label">
-            <span>전체 진행률</span>
-            <strong id="overallProgressText">0%</strong>
-          </div>
-          <div class="progress-track" aria-hidden="true">
-            <span id="overallProgressBar"></span>
-          </div>
-          <button class="ghost-button" id="resetButton" type="button">진행 초기화</button>
-        </div>
-      </aside>
-
-      <main class="workspace">
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">Interactive VMware Learning</p>
-            <h2 id="moduleTitle">VKS L100</h2>
-          </div>
-          <div class="score-pill">
-            <span>정답</span>
-            <strong id="scoreText">0 / 0</strong>
-          </div>
-        </header>
-
-        <section class="hero-panel" id="introPanel">
-          <div>
-            <p class="eyebrow">MVP Scope</p>
-            <h3>VKS L100을 퀴즈와 커맨드 실습으로 점검합니다.</h3>
-            <p>
-              Obsidian의 VKS L100 개념정리와 스킬셋 트래커를 기반으로 만든 개인 학습용 사이트입니다.
-              각 파트를 학습하고, 객관식과 명령어 입력 문제를 풀면 마지막에 부족한 영역을 확인할 수 있습니다.
-            </p>
-          </div>
-          <div class="hero-actions">
-            <button class="primary-button" id="startButton" type="button">첫 문제 시작</button>
-            <button class="secondary-button" id="focusButton" type="button">문제만 풀기</button>
-          </div>
-        </section>
-
-        <section class="content-grid" id="contentGrid">
-          <article class="study-panel">
-            <div class="panel-heading">
-              <p class="eyebrow">Concept Brief</p>
-              <h3 id="conceptTitle">학습 파트를 선택하세요.</h3>
-            </div>
-            <div id="conceptBody" class="concept-body"></div>
-            <div class="command-bank" id="commandBank"></div>
-          </article>
-
-          <article class="quiz-panel">
-            <div class="panel-heading">
-              <p class="eyebrow">Practice</p>
-              <h3>문제 풀이</h3>
-            </div>
-            <div id="questionArea" class="question-area"></div>
-            <div class="quiz-actions">
-              <button class="secondary-button" id="prevQuestionButton" type="button">이전</button>
-              <button class="primary-button" id="checkButton" type="button">정답 확인</button>
-              <button class="secondary-button" id="nextQuestionButton" type="button">다음</button>
-            </div>
-          </article>
-        </section>
-
-        <section class="result-panel" id="resultPanel">
-          <div class="panel-heading">
-            <p class="eyebrow">Result Report</p>
-            <h3>학습 결과</h3>
-          </div>
-          <div id="resultBody"></div>
-        </section>
-      </main>
-    </div>
-
-    <script src="./data/vks-l100.js?v=20260625-5"></script>
-    <script src="./app.js?v=20260625-5"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

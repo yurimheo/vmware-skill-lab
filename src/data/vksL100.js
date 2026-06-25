@@ -1,4 +1,4 @@
-window.VKS_L100 = {
+export const vksL100 = {
   track: "VKS",
   level: "L100 Foundation",
   modules: [
