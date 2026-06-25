@@ -273,6 +273,57 @@ button:hover {
   padding: 28px;
 }
 
+.brand-intro {
+  position: relative;
+  display: grid;
+  min-height: 100vh;
+  overflow: hidden;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(35, 116, 232, 0.22), transparent 24%),
+    linear-gradient(135deg, #f8fbff, #eaf1fb);
+  cursor: pointer;
+}
+
+.intro-pulse {
+  position: absolute;
+  width: min(58vw, 640px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(35, 116, 232, 0.12);
+  border-radius: 50%;
+  animation: introRing 1800ms cubic-bezier(0.18, 0.8, 0.2, 1) both;
+}
+
+.intro-logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  color: var(--ink);
+  animation: introLogo 1900ms cubic-bezier(0.18, 0.8, 0.2, 1) both;
+}
+
+.intro-logo span {
+  display: grid;
+  width: 104px;
+  height: 104px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 54px;
+  font-weight: 900;
+  box-shadow:
+    0 28px 70px rgba(35, 116, 232, 0.34),
+    0 0 0 12px rgba(35, 116, 232, 0.08);
+}
+
+.intro-logo strong {
+  font-size: clamp(34px, 6vw, 76px);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
 .launch-screen {
   display: grid;
   min-height: 100vh;
@@ -367,6 +418,10 @@ button:hover {
 .profile-grid {
   display: grid;
   gap: 18px;
+}
+
+.stage-enter {
+  animation: stageIn 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .solution-grid {
@@ -952,6 +1007,55 @@ code {
   }
 }
 
+@keyframes introLogo {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(0.82);
+  }
+  38% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1.08);
+  }
+  56% {
+    transform: scale(0.96);
+  }
+  72% {
+    transform: scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes introRing {
+  0% {
+    opacity: 0;
+    transform: scale(0.32);
+  }
+  44% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.24);
+  }
+}
+
+@keyframes stageIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (max-width: 1020px) {
   .app-shell {
     grid-template-columns: 1fr;
@@ -996,6 +1100,18 @@ code {
 
   .launch-signal {
     display: none;
+  }
+
+  .intro-logo {
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .intro-logo span {
+    width: 82px;
+    height: 82px;
+    font-size: 42px;
   }
 
   .topbar,

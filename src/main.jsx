@@ -412,11 +412,29 @@ function App() {
 }
 
 function LaunchScreen({ saved, selectedIndex, onSelect }) {
-  const [solutionSelected, setSolutionSelected] = useState(false);
+  const [launchStep, setLaunchStep] = useState("intro");
+
+  useEffect(() => {
+    if (launchStep !== "intro") return undefined;
+    const timer = window.setTimeout(() => setLaunchStep("solution"), 2100);
+    return () => window.clearTimeout(timer);
+  }, [launchStep]);
+
+  if (launchStep === "intro") {
+    return (
+      <main className="brand-intro" onClick={() => setLaunchStep("solution")}>
+        <div className="intro-pulse" aria-hidden="true" />
+        <div className="intro-logo" aria-label="VMware Skill Lab">
+          <span>V</span>
+          <strong>VMware Skill Lab</strong>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main className="launch-screen">
-      <section className="launch-hero" aria-label="VKS level selection">
+    <main className={`launch-screen ${launchStep === "level" ? "level-step" : "solution-step"}`}>
+      <section className="launch-hero" aria-label="VMware learning selection">
         <div className="launch-signal" aria-hidden="true">
           <span />
           <span />
@@ -427,18 +445,18 @@ function LaunchScreen({ saved, selectedIndex, onSelect }) {
           <span className="launch-mark">V</span>
           <div>
             <p className="eyebrow">VMware Skill Lab</p>
-            <h1>{solutionSelected ? "학습할 VKS 레벨을 선택하세요." : "학습할 VMware 솔루션을 선택하세요."}</h1>
+            <h1>{launchStep === "level" ? "학습할 VKS 레벨을 선택하세요." : "학습할 VMware 솔루션을 선택하세요."}</h1>
             <p>
-              {solutionSelected
+              {launchStep === "level"
                 ? "각 레벨은 개념 학습, 문제 풀이, 커맨드 실습, 결과 리포트로 구성됩니다."
                 : "현재 MVP는 VKS 트랙부터 시작합니다. 이후 vSphere, vSAN, NSX, VCF 트랙으로 확장할 수 있습니다."}
             </p>
           </div>
         </div>
 
-        {!solutionSelected ? (
-          <div className="solution-grid">
-            <button className="solution-card selected" type="button" onClick={() => setSolutionSelected(true)}>
+        {launchStep === "solution" ? (
+          <div className="solution-grid stage-enter">
+            <button className="solution-card selected" type="button" onClick={() => setLaunchStep("level")}>
               <span className="solution-icon">VKS</span>
               <span className="profile-name">vSphere Kubernetes Service</span>
               <span className="profile-description">
@@ -456,10 +474,10 @@ function LaunchScreen({ saved, selectedIndex, onSelect }) {
           </div>
         ) : (
           <>
-            <button className="back-link" type="button" onClick={() => setSolutionSelected(false)}>
+            <button className="back-link" type="button" onClick={() => setLaunchStep("solution")}>
               솔루션 다시 선택
             </button>
-            <div className="profile-grid">
+            <div className="profile-grid stage-enter">
               {vksTracks.map((track, index) => {
                 const pool = allQuestions(track);
                 const savedAnswers = saved.tracks?.[track.label]?.answers ?? {};
