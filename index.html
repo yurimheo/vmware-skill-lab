@@ -38,7 +38,7 @@
             <h2 id="moduleTitle">VKS L100</h2>
           </div>
           <div class="score-pill">
-            <span>현재 점수</span>
+            <span>정답</span>
             <strong id="scoreText">0 / 0</strong>
           </div>
         </header>
@@ -52,10 +52,13 @@
               각 파트를 학습하고, 객관식과 명령어 입력 문제를 풀면 마지막에 부족한 영역을 확인할 수 있습니다.
             </p>
           </div>
-          <button class="primary-button" id="startButton" type="button">첫 파트 시작</button>
+          <div class="hero-actions">
+            <button class="primary-button" id="startButton" type="button">첫 문제 시작</button>
+            <button class="secondary-button" id="focusButton" type="button">문제만 풀기</button>
+          </div>
         </section>
 
-        <section class="content-grid">
+        <section class="content-grid" id="contentGrid">
           <article class="study-panel">
             <div class="panel-heading">
               <p class="eyebrow">Concept Brief</p>

@@ -263,16 +263,35 @@ textarea {
   line-height: 1.65;
 }
 
+.hero-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
   gap: 20px;
 }
 
+.content-grid.focus-mode {
+  grid-template-columns: minmax(0, 860px);
+  justify-content: center;
+}
+
+.content-grid.focus-mode .study-panel {
+  display: none;
+}
+
 .study-panel,
 .quiz-panel,
 .result-panel {
   padding: 22px;
+}
+
+.content-grid.focus-mode .quiz-panel {
+  min-height: 520px;
 }
 
 .result-panel {
@@ -549,6 +568,10 @@ code {
   .topbar,
   .hero-panel {
     align-items: stretch;
+    flex-direction: column;
+  }
+
+  .hero-actions {
     flex-direction: column;
   }
 

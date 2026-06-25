@@ -3,6 +3,7 @@ const STORAGE_KEY = "vmware-skill-lab:vks-l100";
 const state = {
   moduleIndex: 0,
   questionIndex: 0,
+  focusMode: false,
   answers: {},
 };
 
@@ -14,6 +15,8 @@ const els = {
   scoreText: document.querySelector("#scoreText"),
   introPanel: document.querySelector("#introPanel"),
   startButton: document.querySelector("#startButton"),
+  focusButton: document.querySelector("#focusButton"),
+  contentGrid: document.querySelector("#contentGrid"),
   conceptTitle: document.querySelector("#conceptTitle"),
   conceptBody: document.querySelector("#conceptBody"),
   commandBank: document.querySelector("#commandBank"),
@@ -47,6 +50,7 @@ function loadState() {
     if (!saved) return;
     state.moduleIndex = saved.moduleIndex ?? 0;
     state.questionIndex = saved.questionIndex ?? 0;
+    state.focusMode = saved.focusMode ?? false;
     state.answers = saved.answers ?? {};
   } catch {
     state.answers = {};
@@ -59,6 +63,7 @@ function saveState() {
     JSON.stringify({
       moduleIndex: state.moduleIndex,
       questionIndex: state.questionIndex,
+      focusMode: state.focusMode,
       answers: state.answers,
     }),
   );
@@ -79,14 +84,33 @@ function getScore() {
   return { correct, total: all.length };
 }
 
+function getProgress() {
+  const all = getAllQuestions();
+  const completed = all.filter(({ module, index }) => {
+    const answer = state.answers[getQuestionKey(module.id, index)];
+    return answer?.checked;
+  }).length;
+  return { completed, total: all.length };
+}
+
 function getModuleScore(module) {
   const total = module.questions.length;
   const correct = module.questions.filter((_, index) => {
     const answer = state.answers[getQuestionKey(module.id, index)];
     return answer?.correct;
   }).length;
-  const answered = module.questions.filter((_, index) => state.answers[getQuestionKey(module.id, index)]).length;
+  const answered = module.questions.filter((_, index) => {
+    const answer = state.answers[getQuestionKey(module.id, index)];
+    return answer?.checked;
+  }).length;
   return { correct, total, answered };
+}
+
+function getCurrentGlobalQuestionNumber() {
+  const priorQuestions = window.VKS_L100.modules
+    .slice(0, state.moduleIndex)
+    .reduce((sum, module) => sum + module.questions.length, 0);
+  return priorQuestions + state.questionIndex + 1;
 }
 
 function escapeHtml(value) {
@@ -107,7 +131,7 @@ function renderModules() {
           <span class="module-index">${index + 1}</span>
           <span>
             <span class="module-name">${module.shortTitle}</span>
-            <span class="module-meta">${score.answered}/${score.total} answered</span>
+            <span class="module-meta">${score.answered}/${score.total} completed</span>
           </span>
           <span class="module-score">${score.correct}/${score.total}</span>
         </button>
@@ -146,6 +170,8 @@ function renderQuestion() {
   const question = getCurrentQuestion();
   const key = getQuestionKey(module.id, state.questionIndex);
   const saved = state.answers[key];
+  const globalNumber = getCurrentGlobalQuestionNumber();
+  const globalTotal = getAllQuestions().length;
 
   let inputHtml = "";
   if (question.type === "choice") {
@@ -168,16 +194,16 @@ function renderQuestion() {
     `;
   }
 
-  const feedbackClass = saved ? (saved.correct ? " correct" : " wrong") : "";
-  const feedbackText = saved
+  const feedbackClass = saved?.checked ? (saved.correct ? " correct" : " wrong") : "";
+  const feedbackText = saved?.checked
     ? `${saved.correct ? "정답입니다." : "다시 확인해보세요."} ${question.explanation}${question.sample ? ` 예: ${question.sample}` : ""}`
     : "답을 선택하거나 명령어를 입력한 뒤 정답 확인을 누르세요.";
 
   els.questionArea.innerHTML = `
     <div class="question-card">
       <div class="question-meta">
-        <span>${module.shortTitle}</span>
-        <span>${state.questionIndex + 1} / ${module.questions.length}</span>
+        <span>${state.focusMode ? "L100 Focus Mode" : module.shortTitle}</span>
+        <span>${state.focusMode ? `${globalNumber} / ${globalTotal}` : `${state.questionIndex + 1} / ${module.questions.length}`}</span>
       </div>
       <p class="question-text">${question.prompt}</p>
       ${inputHtml}
@@ -264,7 +290,8 @@ function moveQuestion(delta) {
 
 function renderProgress() {
   const score = getScore();
-  const percent = score.total ? Math.round((score.correct / score.total) * 100) : 0;
+  const progress = getProgress();
+  const percent = progress.total ? Math.round((progress.completed / progress.total) * 100) : 0;
   els.overallProgressText.textContent = `${percent}%`;
   els.overallProgressBar.style.width = `${percent}%`;
   els.scoreText.textContent = `${score.correct} / ${score.total}`;
@@ -272,7 +299,9 @@ function renderProgress() {
 
 function renderResults() {
   const score = getScore();
+  const progress = getProgress();
   const percent = score.total ? Math.round((score.correct / score.total) * 100) : 0;
+  const progressPercent = progress.total ? Math.round((progress.completed / progress.total) * 100) : 0;
   const moduleRows = window.VKS_L100.modules.map((module) => {
     const moduleScore = getModuleScore(module);
     const modulePercent = moduleScore.total ? Math.round((moduleScore.correct / moduleScore.total) * 100) : 0;
@@ -284,7 +313,7 @@ function renderResults() {
     <div class="result-summary">
       <div class="metric"><span>총점</span><strong>${percent}%</strong></div>
       <div class="metric"><span>정답</span><strong>${score.correct}</strong></div>
-      <div class="metric"><span>문항</span><strong>${score.total}</strong></div>
+      <div class="metric"><span>진행</span><strong>${progressPercent}%</strong></div>
     </div>
     <div class="skill-bars">
       ${moduleRows
@@ -310,6 +339,9 @@ function renderResults() {
 }
 
 function render() {
+  document.body.classList.toggle("focus-mode", state.focusMode);
+  els.contentGrid.classList.toggle("focus-mode", state.focusMode);
+  els.focusButton.textContent = state.focusMode ? "개념 같이 보기" : "문제만 풀기";
   renderModules();
   renderConcept();
   renderQuestion();
@@ -318,7 +350,19 @@ function render() {
 }
 
 els.startButton.addEventListener("click", () => {
-  els.introPanel.scrollIntoView({ behavior: "smooth", block: "end" });
+  state.focusMode = false;
+  state.moduleIndex = 0;
+  state.questionIndex = 0;
+  saveState();
+  render();
+  els.questionArea.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+els.focusButton.addEventListener("click", () => {
+  state.focusMode = !state.focusMode;
+  saveState();
+  render();
+  els.questionArea.scrollIntoView({ behavior: "smooth", block: "center" });
 });
 
 els.checkButton.addEventListener("click", checkAnswer);
@@ -328,6 +372,7 @@ els.resetButton.addEventListener("click", () => {
   if (!confirm("저장된 진행률을 초기화할까요?")) return;
   state.moduleIndex = 0;
   state.questionIndex = 0;
+  state.focusMode = false;
   state.answers = {};
   saveState();
   render();
