@@ -276,8 +276,8 @@ textarea {
 }
 
 .content-grid.focus-mode {
-  grid-template-columns: minmax(0, 1180px);
-  justify-content: center;
+  grid-template-columns: 1fr;
+  justify-content: stretch;
 }
 
 .content-grid.focus-mode .study-panel {
@@ -296,11 +296,6 @@ textarea {
 
 body.focus-mode:not(.focus-complete) .result-panel {
   display: none;
-}
-
-body.focus-mode .workspace {
-  max-width: 1500px;
-  margin: 0 auto;
 }
 
 .result-panel {
