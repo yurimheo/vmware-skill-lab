@@ -40,6 +40,13 @@ export const vksL100 = {
           explanation: "Service는 Selector와 Pod Label 매칭을 통해 Endpoint를 구성합니다.",
         },
         {
+          type: "choice",
+          prompt: "Deployment가 Pod 복제본 수를 유지할 때 내부적으로 생성해 관리하는 리소스는 무엇인가요?",
+          options: ["ReplicaSet", "StorageClass", "Ingress", "Secret"],
+          answer: 0,
+          explanation: "Deployment는 ReplicaSet을 통해 원하는 Pod replicas 상태를 유지합니다.",
+        },
+        {
           type: "command",
           prompt: "app-ns namespace의 Pod 목록을 조회하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+get\\s+po(ds)?\\s+-n\\s+app-ns$", "^kubectl\\s+-n\\s+app-ns\\s+get\\s+po(ds)?$"],
@@ -84,6 +91,13 @@ export const vksL100 = {
           explanation: "VM은 OS 전체, 컨테이너는 프로세스 단위 격리에 가깝습니다.",
         },
         {
+          type: "choice",
+          prompt: "VKS에서 Pod가 실행되는 기반 OS와 리소스를 제공하는 Kubernetes Node는 vSphere에서 주로 어떤 형태로 보이나요?",
+          options: ["가상 머신", "데이터스토어 폴더", "vCenter 사용자", "분산 포트그룹"],
+          answer: 0,
+          explanation: "TKC Worker Node는 vCenter에서 VM으로 생성되고, 그 VM 위에서 Pod가 실행됩니다.",
+        },
+        {
           type: "command",
           prompt: "Kubernetes Node의 Internal IP와 OS Image까지 함께 확인하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+get\\s+nodes\\s+-o\\s+wide$"],
@@ -126,6 +140,13 @@ export const vksL100 = {
           explanation: "TKC는 vSphere Namespace 안에 배포되고 해당 Namespace의 정책과 권한을 따릅니다.",
         },
         {
+          type: "choice",
+          prompt: "vSphere Namespace에 연결되는 항목으로 가장 적절한 것은 무엇인가요?",
+          options: ["Storage Policy와 사용자 권한", "브라우저 캐시", "Pod 내부 /tmp 용량", "터미널 프로필"],
+          answer: 0,
+          explanation: "vSphere Namespace에는 사용자/그룹 권한, 리소스 제한, Storage Policy 등이 연결됩니다.",
+        },
+        {
           type: "command",
           prompt: "Supervisor에 로그인한 뒤 사용할 수 있는 context 목록을 확인하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+config\\s+get-contexts$"],
@@ -161,6 +182,13 @@ export const vksL100 = {
           options: ["TKG/TKC Guest Cluster", "vSphere Pod", "ESXi Shell", "vCenter Alarm"],
           answer: 0,
           explanation: "TKC는 독립적인 게스트 Kubernetes 클러스터로 표준 Kubernetes API를 제공합니다.",
+        },
+        {
+          type: "choice",
+          prompt: "애플리케이션 Pod와 Service를 일반적인 Kubernetes 방식으로 운영할 때 주로 접속하는 Context는 무엇인가요?",
+          options: ["TKC Context", "ESXi DCUI", "vCenter 라이선스 화면", "Harbor Project 설정"],
+          answer: 0,
+          explanation: "애플리케이션 워크로드는 보통 TKC Context에서 배포하고 조회합니다.",
         },
         {
           type: "command",
@@ -206,6 +234,13 @@ export const vksL100 = {
           explanation: "vSphere CSI Driver는 Kubernetes PVC와 vSphere CNS/Volume을 연결합니다.",
         },
         {
+          type: "choice",
+          prompt: "Pod 간 통신은 안 되지만 Pod 자체는 Running일 때 우선 확인할 가능성이 높은 영역은 무엇인가요?",
+          options: ["CNI와 NetworkPolicy", "StorageClass만", "TKR 목록만", "로컬 브라우저 설정"],
+          answer: 0,
+          explanation: "Pod 네트워크 문제는 CNI 상태와 NetworkPolicy 적용 여부를 함께 확인해야 합니다.",
+        },
+        {
           type: "command",
           prompt: "전체 namespace의 PVC와 PV 상태를 한 번에 확인하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+get\\s+pvc,pv\\s+-A$", "^kubectl\\s+get\\s+pv,pvc\\s+-A$"],
@@ -249,6 +284,13 @@ export const vksL100 = {
           answer: 0,
           explanation: "Tanzu 에디션에 따라 사용 가능한 부가 기능 범위가 달라질 수 있습니다.",
         },
+        {
+          type: "choice",
+          prompt: "Workload Management 활성화 메뉴가 보이지 않거나 사용할 수 없을 때 1차로 함께 확인할 항목은 무엇인가요?",
+          options: ["vSphere 버전과 라이선스", "Pod 로그 파일명", "Service 포트 이름", "YAML 주석 수"],
+          answer: 0,
+          explanation: "VKS 사용 가능 여부는 vSphere 버전, 라이선스, 클러스터 요구사항의 영향을 받습니다.",
+        },
       ],
     },
     {
@@ -287,6 +329,13 @@ export const vksL100 = {
           options: ["kubectl apply -f", "kubectl logs -f", "kubectl config get-contexts", "kubectl top nodes"],
           answer: 0,
           explanation: "`kubectl apply -f <file>`은 선언형 리소스를 생성 또는 갱신합니다.",
+        },
+        {
+          type: "choice",
+          prompt: "현재 kubectl이 어느 클러스터/namespace를 바라보는지 확인해야 하는 이유로 가장 적절한 것은 무엇인가요?",
+          options: ["잘못된 Context에서 리소스를 변경하는 사고를 줄이기 위해", "명령어 글자 수를 줄이기 위해", "로그 색상을 바꾸기 위해", "YAML 파일을 압축하기 위해"],
+          answer: 0,
+          explanation: "Supervisor와 TKC Context를 혼동하면 엉뚱한 계층에서 조회하거나 변경할 수 있습니다.",
         },
         {
           type: "command",

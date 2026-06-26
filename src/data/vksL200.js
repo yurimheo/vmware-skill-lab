@@ -29,6 +29,13 @@ export const vksL200 = {
           explanation: "Supervisor API Endpoint는 Supervisor Cluster에 kubectl로 접속하는 진입점입니다.",
         },
         {
+          type: "choice",
+          prompt: "Supervisor 활성화 전 사전 점검 항목으로 가장 적절한 조합은 무엇인가요?",
+          options: ["라이선스, 네트워크, Load Balancer, Storage Policy", "브라우저 테마, 폰트, 탭 위치, 즐겨찾기", "Pod 이름, Secret 이름, ConfigMap 줄 수, 이미지 태그 길이", "README 제목, 파일명, 커밋 메시지, 터미널 크기"],
+          answer: 0,
+          explanation: "Workload Management 활성화는 vSphere 라이선스와 네트워크/LB/스토리지 준비 상태의 영향을 받습니다.",
+        },
+        {
           type: "command",
           prompt: "Supervisor 접속 후 사용할 수 있는 context 목록을 확인하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+config\\s+get-contexts$"],
@@ -61,6 +68,13 @@ export const vksL200 = {
           explanation: "브라우저 북마크는 Namespace 운영 정책과 관련이 없습니다.",
         },
         {
+          type: "choice",
+          prompt: "운영 환경에서 vSphere Namespace 권한을 개인 계정보다 그룹에 주는 편이 나은 이유는 무엇인가요?",
+          options: ["권한 회수와 감사 추적이 쉬워서", "Pod 생성 속도가 빨라져서", "PVC 용량이 자동 증가해서", "Ingress 인증서가 자동 갱신돼서"],
+          answer: 0,
+          explanation: "그룹 기반 권한은 인력 변경 시 운영 부담과 권한 누락 위험을 줄입니다.",
+        },
+        {
           type: "command",
           prompt: "app-ns namespace의 ResourceQuota를 확인하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+get\\s+resourcequota\\s+-n\\s+app-ns$", "^kubectl\\s+-n\\s+app-ns\\s+get\\s+resourcequota$"],
@@ -91,6 +105,13 @@ export const vksL200 = {
           options: ["kubectl describe tkc", "kubectl logs svc", "kubectl delete namespace", "docker build"],
           answer: 0,
           explanation: "`describe tkc`는 TKC 리소스의 상태와 Events를 확인할 때 사용합니다.",
+        },
+        {
+          type: "choice",
+          prompt: "TKC YAML에서 Kubernetes 버전 선택과 가장 관련 있는 필드는 무엇인가요?",
+          options: ["TKR 참조", "Service selector", "Ingress path", "PVC accessMode"],
+          answer: 0,
+          explanation: "TKC는 사용 가능한 TKR을 참조해 Kubernetes 릴리즈를 선택합니다.",
         },
         {
           type: "command",
@@ -126,6 +147,13 @@ export const vksL200 = {
         },
         {
           type: "command",
+          prompt: "app-ns namespace에서 Deployment, Pod, Service를 한 번에 조회하는 명령어를 입력하세요.",
+          patterns: ["^kubectl\\s+get\\s+deploy,pod,svc\\s+-n\\s+app-ns$", "^kubectl\\s+-n\\s+app-ns\\s+get\\s+deploy,pod,svc$"],
+          sample: "kubectl get deploy,pod,svc -n app-ns",
+          explanation: "배포 후에는 Deployment, Pod, Service 상태를 함께 보면 연결 흐름을 빠르게 확인할 수 있습니다.",
+        },
+        {
+          type: "command",
           prompt: "app.yaml을 클러스터에 적용하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+apply\\s+-f\\s+app\\.yaml$"],
           sample: "kubectl apply -f app.yaml",
@@ -155,6 +183,13 @@ export const vksL200 = {
           options: ["vSphere CSI", "CoreDNS", "AKO", "External DNS"],
           answer: 0,
           explanation: "vSphere CSI는 Kubernetes PVC와 vSphere CNS 볼륨을 연결합니다.",
+        },
+        {
+          type: "choice",
+          prompt: "PVC가 Pending 상태일 때 우선 확인할 항목으로 가장 적절한 것은 무엇인가요?",
+          options: ["StorageClass와 PVC Events", "Ingress host만", "Pod 로그 색상", "컨테이너 이미지 이름 길이"],
+          answer: 0,
+          explanation: "PVC Pending은 StorageClass 존재 여부, 접근 모드, CSI 이벤트, 데이터스토어 정책을 함께 확인합니다.",
         },
         {
           type: "command",
@@ -189,6 +224,13 @@ export const vksL200 = {
           explanation: "Ingress는 L7 HTTP/HTTPS 라우팅을 담당합니다.",
         },
         {
+          type: "choice",
+          prompt: "LoadBalancer Service가 External IP Pending 상태일 때 우선 확인할 영역은 무엇인가요?",
+          options: ["VIP Pool과 Load Balancer 연동", "PVC accessMode", "Pod restartPolicy", "ConfigMap key 정렬"],
+          answer: 0,
+          explanation: "External IP가 할당되지 않으면 Load Balancer, VIP Pool, AKO/NSX 연동 상태를 확인해야 합니다.",
+        },
+        {
           type: "command",
           prompt: "app-ns namespace의 Ingress 목록을 조회하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+get\\s+ingress\\s+-n\\s+app-ns$", "^kubectl\\s+-n\\s+app-ns\\s+get\\s+ingress$"],
@@ -219,6 +261,13 @@ export const vksL200 = {
           options: ["지원되는 TKR 경로", "브라우저 확대 비율", "Pod 이름 길이", "터미널 테마"],
           answer: 0,
           explanation: "지원되지 않는 버전 경로로 업그레이드하면 클러스터 상태가 불안정해질 수 있습니다.",
+        },
+        {
+          type: "choice",
+          prompt: "TKR 업그레이드 중 운영자가 계속 관찰해야 하는 상태로 가장 적절한 것은 무엇인가요?",
+          options: ["TKC 상태와 Node Ready 상태", "README 줄 수", "터미널 폰트", "브라우저 다운로드 위치"],
+          answer: 0,
+          explanation: "업그레이드 중에는 TKC 조건, Control Plane/Worker 교체, Node Ready 상태를 함께 봐야 합니다.",
         },
         {
           type: "command",
@@ -253,6 +302,13 @@ export const vksL200 = {
           explanation: "Worker nodePool의 replicas 값이 원하는 노드 수를 나타냅니다.",
         },
         {
+          type: "choice",
+          prompt: "스케일 인 전에 확인해야 하는 항목으로 가장 적절한 것은 무엇인가요?",
+          options: ["PDB와 중요 Pod 배치 상태", "CSS 변수명", "Pod 이름의 길이", "터미널 배경색"],
+          answer: 0,
+          explanation: "노드 축소는 Pod Eviction을 유발하므로 PDB와 중요 워크로드 배치 상태를 먼저 확인합니다.",
+        },
+        {
           type: "command",
           prompt: "노드 생성/삭제 상태를 실시간으로 확인하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+get\\s+nodes\\s+-w$"],
@@ -284,6 +340,13 @@ export const vksL200 = {
           options: ["--previous", "--all-namespaces", "--watch-only", "--selector"],
           answer: 0,
           explanation: "`--previous`는 이전 컨테이너 인스턴스 로그를 확인할 때 사용합니다.",
+        },
+        {
+          type: "command",
+          prompt: "전체 namespace의 이벤트를 최신 시간 기준으로 정렬해 확인하는 명령어를 입력하세요.",
+          patterns: ["^kubectl\\s+get\\s+events\\s+-A\\s+--sort-by='\\.lastTimestamp'$", "^kubectl\\s+get\\s+events\\s+--all-namespaces\\s+--sort-by='\\.lastTimestamp'$"],
+          sample: "kubectl get events -A --sort-by='.lastTimestamp'",
+          explanation: "최근 이벤트를 시간순으로 보면 Pending, FailedScheduling, ImagePullBackOff 같은 원인을 빠르게 찾을 수 있습니다.",
         },
         {
           type: "command",
