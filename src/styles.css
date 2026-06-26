@@ -795,8 +795,7 @@ button:hover {
   flex: 0 0 auto;
 }
 
-.hint-bubble,
-.tutorial-popover {
+.hint-bubble {
   position: absolute;
   z-index: 20;
   width: min(280px, 72vw);
@@ -828,19 +827,6 @@ button:hover {
 .info-hint:focus-visible .hint-bubble {
   opacity: 1;
   transform: translate(-50%, 0);
-}
-
-.tutorial-popover {
-  top: calc(100% + 10px);
-  right: 12px;
-}
-
-.status-metric:hover .tutorial-popover,
-.status-metric:focus-visible .tutorial-popover,
-.module-node:hover .tutorial-popover,
-.module-node:focus-visible .tutorial-popover {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 .reveal-text {
@@ -1759,7 +1745,6 @@ code {
     display: none;
   }
 
-  .tutorial-popover,
   .hint-bubble {
     display: none;
   }

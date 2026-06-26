@@ -614,7 +614,6 @@ function StatusMetric({ icon, label, value, detail, tone, onClick, hint }) {
         <strong>{value}</strong>
         <small>{detail}</small>
       </span>
-      {hint && <span className="tutorial-popover">{hint}</span>}
     </Element>
   );
 }
