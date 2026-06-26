@@ -621,7 +621,7 @@ function ModuleOverview({ modules, activeModuleId, getModuleScore, onSelect }) {
             className={`module-node ${status}`}
             key={module.id}
             type="button"
-            title={module.title}
+            aria-label={`${module.title}: ${moduleScore.correct}/${moduleScore.total} correct`}
             onClick={() => onSelect(index)}
           >
             <span className="node-index">{index + 1}</span>
@@ -631,9 +631,6 @@ function ModuleOverview({ modules, activeModuleId, getModuleScore, onSelect }) {
             </span>
             <span className="node-bar" aria-hidden="true">
               <span style={{ width: `${percent}%` }} />
-            </span>
-            <span className="tutorial-popover">
-              {module.title}로 이동합니다. 막대는 해당 Skill Area에서 확인한 문항 비율입니다.
             </span>
           </button>
         );
