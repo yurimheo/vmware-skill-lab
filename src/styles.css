@@ -1317,11 +1317,77 @@ code {
   transition: width 320ms ease;
 }
 
-.review-list {
-  margin: 16px 0 0;
-  padding-left: 20px;
+.review-focus {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.review-focus-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   color: var(--muted);
-  line-height: 1.6;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.review-focus-heading strong {
+  color: var(--teal);
+}
+
+.review-focus-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.review-focus-card {
+  display: grid;
+  gap: 6px;
+  min-height: 112px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcf8;
+}
+
+.review-focus-card span {
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.review-focus-card strong {
+  line-height: 1.35;
+}
+
+.review-focus-card small,
+.review-focus-more,
+.review-stable {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.review-focus-more {
+  display: grid;
+  min-height: 112px;
+  place-items: center;
+  padding: 14px;
+  border: 1px dashed #c9d3ca;
+  border-radius: 8px;
+  background: #f5f7f2;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.review-stable {
+  margin: 0;
 }
 
 .answer-review {
@@ -1762,6 +1828,7 @@ code {
 
   .quiz-actions,
   .result-summary,
+  .review-focus-grid,
   .skill-row {
     grid-template-columns: 1fr;
   }

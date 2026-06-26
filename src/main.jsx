@@ -902,6 +902,9 @@ function getFeedback(mode, question, answer) {
 }
 
 function ResultPanel({ mode, scorePercent, score, progressPercent, modules, getModuleScore, weakModules, incorrect, answers }) {
+  const priorityModules = weakModules.slice(0, 3);
+  const hiddenWeakCount = Math.max(weakModules.length - priorityModules.length, 0);
+
   return (
     <section className="result-panel panel-enter">
       <div className="panel-heading">
@@ -933,13 +936,29 @@ function ResultPanel({ mode, scorePercent, score, progressPercent, modules, getM
         })}
       </div>
 
-      <ul className="review-list">
+      <div className="review-focus">
+        <div className="review-focus-heading">
+          <span>우선 복습 영역</span>
+          {weakModules.length ? <strong>{weakModules.length} areas</strong> : <strong>stable</strong>}
+        </div>
         {weakModules.length ? (
-          weakModules.map(({ module }) => <li key={module.id}>{module.title} 부족</li>)
+          <div className="review-focus-grid">
+            {priorityModules.map(({ module, score: moduleScore }) => {
+              const percent = moduleScore.total ? Math.round((moduleScore.correct / moduleScore.total) * 100) : 0;
+              return (
+                <article className="review-focus-card" key={module.id}>
+                  <span>{module.shortTitle}</span>
+                  <strong>{module.title}</strong>
+                  <small>{moduleScore.correct}/{moduleScore.total} correct · {percent}%</small>
+                </article>
+              );
+            })}
+            {hiddenWeakCount > 0 && <div className="review-focus-more">+{hiddenWeakCount}개 영역은 위 진행 막대에서 확인</div>}
+          </div>
         ) : (
-          <li>현재 기준으로 모든 파트가 안정권입니다. 다음 레벨 학습으로 확장해도 좋습니다.</li>
+          <p className="review-stable">현재 기준으로 모든 파트가 안정권입니다. 다음 레벨 학습으로 확장해도 좋습니다.</p>
         )}
-      </ul>
+      </div>
 
       {mode === "focus" && (
         <div className="answer-review">
