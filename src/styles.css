@@ -1,7 +1,7 @@
 @font-face {
-  font-family: "Paperozi";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-1Thin.woff2") format("woff2");
-  font-weight: 100;
+  font-family: "HappinessSans";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2205@1.0/Happiness-Sans-Regular.woff2") format("woff2");
+  font-weight: 400;
   font-display: swap;
 }
 
@@ -36,7 +36,7 @@ body {
   background-size: 28px 28px;
   color: var(--ink);
   font-family:
-    Paperozi, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    HappinessSans, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
 }
 
@@ -1573,16 +1573,17 @@ code {
 
 @media (max-width: 680px) {
   body {
-    background-size: 22px 22px;
+    background: #f3f5f2;
   }
 
   .workspace,
   .sidebar {
-    padding: 16px;
+    padding: 14px 16px;
   }
 
   .app-shell {
     display: block;
+    min-height: 100vh;
   }
 
   .sidebar {
@@ -1591,10 +1592,13 @@ code {
     z-index: 30;
     display: grid;
     height: auto;
-    gap: 12px;
+    gap: 10px;
+    padding-top: calc(12px + env(safe-area-inset-top));
     border-right: 0;
     border-bottom: 1px solid var(--line);
+    background: rgba(250, 251, 248, 0.94);
     box-shadow: 0 10px 24px rgba(32, 37, 45, 0.08);
+    backdrop-filter: blur(16px);
   }
 
   .brand {
@@ -1616,20 +1620,26 @@ code {
 
   .module-list {
     display: grid;
-    grid-auto-columns: minmax(132px, 44vw);
+    grid-auto-columns: minmax(118px, 38vw);
     grid-auto-flow: column;
     flex: none;
-    gap: 8px;
+    gap: 7px;
     margin: 0 -16px;
     overflow-x: auto;
     padding: 0 16px 4px;
+    scrollbar-width: none;
+  }
+
+  .module-list::-webkit-scrollbar {
+    display: none;
   }
 
   .module-button {
-    grid-template-columns: 26px minmax(0, 1fr);
-    min-height: 52px;
-    padding: 9px;
+    grid-template-columns: 24px minmax(0, 1fr);
+    min-height: 46px;
+    padding: 8px;
     border-color: var(--line);
+    border-radius: 999px;
     background: #fff;
   }
 
@@ -1638,13 +1648,14 @@ code {
   }
 
   .module-index {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
   }
 
   .module-name {
     overflow: hidden;
-    font-size: 13px;
+    font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -1662,7 +1673,7 @@ code {
   }
 
   .sidebar-footer .ghost-button {
-    min-height: 34px;
+    min-height: 32px;
     padding: 0 10px;
     font-size: 12px;
   }
@@ -1672,7 +1683,8 @@ code {
   }
 
   .workspace {
-    padding-top: 14px;
+    padding-top: 12px;
+    padding-bottom: calc(92px + env(safe-area-inset-bottom));
   }
 
   .launch-screen {
@@ -1712,12 +1724,12 @@ code {
 
   .topbar {
     gap: 8px;
-    margin-bottom: 12px;
-    padding-bottom: 12px;
+    margin-bottom: 10px;
+    padding: 0 0 10px;
   }
 
   .topbar h2 {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .breadcrumb,
@@ -1742,7 +1754,7 @@ code {
   .content-grid {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
   }
 
   .practice-panel {
@@ -1757,6 +1769,8 @@ code {
   .quiz-panel,
   .result-panel {
     padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(32, 37, 45, 0.07);
   }
 
   .panel-heading.inline-heading {
@@ -1791,7 +1805,32 @@ code {
     font-size: 14px;
   }
 
-  .quiz-actions,
+  .quiz-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 25;
+    display: grid;
+    grid-template-columns: 0.9fr 1.2fr 0.9fr;
+    gap: 8px;
+    margin: 16px -16px -16px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    border-radius: 0 0 12px 12px;
+    background: rgba(250, 251, 248, 0.94);
+    backdrop-filter: blur(16px);
+  }
+
+  .focus-mode .quiz-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .quiz-actions .primary-button,
+  .quiz-actions .secondary-button {
+    min-height: 46px;
+    padding: 0 10px;
+    white-space: nowrap;
+  }
+
   .result-summary,
   .review-focus-grid,
   .skill-row {
