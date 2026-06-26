@@ -54,8 +54,71 @@ function shuffle(items) {
   return next;
 }
 
-function normalizeCommand(value) {
-  return value.trim().replace(/\s+/g, " ");
+function normalizeCommand(value, { canonicalResources = true } = {}) {
+  const tokens = value.trim().replace(/\s+/g, " ").split(" ").filter(Boolean);
+  if (!tokens.length) return "";
+
+  if (tokens[0] === "k") tokens[0] = "kubectl";
+  if (!canonicalResources) return tokens.join(" ");
+
+  const verbIndex = tokens.findIndex((token) =>
+    ["get", "describe", "logs", "exec", "apply", "diff", "edit", "delete"].includes(token),
+  );
+  if (verbIndex === -1) return tokens.join(" ");
+
+  const verb = tokens[verbIndex];
+  const resourceIndex = verbIndex + 1;
+  const resource = tokens[resourceIndex];
+
+  if (verb === "get" && resource) {
+    const aliases = {
+      pod: "pods",
+      po: "pods",
+      deploy: "deployment",
+      deployments: "deployment",
+      svc: "svc",
+      service: "svc",
+      services: "svc",
+      ep: "endpoints",
+      endpoint: "endpoints",
+      ing: "ingress",
+      ingresses: "ingress",
+      ns: "namespaces",
+      namespace: "namespaces",
+      sc: "storageclass",
+      storageclasses: "storageclass",
+      quota: "resourcequota",
+      quotas: "resourcequota",
+    };
+    tokens[resourceIndex] = resource
+      .split(",")
+      .map((item) => aliases[item] ?? item)
+      .join(",");
+  }
+
+  if (verb === "describe" && resource) {
+    const aliases = {
+      pods: "pod",
+      po: "pod",
+      deployments: "deployment",
+      deploy: "deployment",
+      services: "svc",
+      service: "svc",
+      ingresses: "ingress",
+      ing: "ingress",
+      pvc: "pvc",
+    };
+    tokens[resourceIndex] = aliases[resource] ?? resource;
+  }
+
+  return tokens.join(" ");
+}
+
+function commandCandidates(value) {
+  return [...new Set([
+    normalizeCommand(value, { canonicalResources: false }),
+    normalizeCommand(value),
+  ])].filter(Boolean);
 }
 
 function getCorrectAnswerText(question) {
@@ -201,9 +264,10 @@ function App() {
     if (currentQuestion.type === "choice") {
       correct = value === currentQuestion.answer;
     } else {
-      value = normalizeCommand(String(value));
-      if (!value) return false;
-      correct = currentQuestion.patterns.some((pattern) => new RegExp(pattern).test(value));
+      const candidates = commandCandidates(String(value));
+      if (!candidates.length) return false;
+      value = candidates[0];
+      correct = currentQuestion.patterns.some((pattern) => candidates.some((candidate) => new RegExp(pattern).test(candidate)));
     }
 
     setAnswers((prev) => ({
