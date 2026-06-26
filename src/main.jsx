@@ -274,13 +274,13 @@ function App() {
   return (
     <div className={`app-shell ${mode === "focus" ? "focus-mode" : ""}`}>
       <aside className="sidebar">
-        <div className="brand">
+        <button className="brand brand-button" type="button" onClick={() => setShowGate(true)} aria-label="레벨 선택 화면으로 돌아가기">
           <span className="brand-mark">V</span>
           <div>
             <h1>VMware Skill Lab</h1>
             <p>{selectedTrack.level}</p>
           </div>
-        </div>
+        </button>
 
         <nav className="module-list" aria-label={`${selectedTrack.label} modules`}>
           {selectedTrack.modules.map((module, index) => {

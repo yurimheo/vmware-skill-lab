@@ -73,6 +73,22 @@ button:hover {
   gap: 12px;
 }
 
+.brand-button {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.brand-button:hover .brand-mark {
+  box-shadow:
+    0 14px 30px rgba(35, 116, 232, 0.34),
+    0 0 0 6px rgba(35, 116, 232, 0.08);
+}
+
 .brand-mark {
   display: grid;
   width: 42px;
