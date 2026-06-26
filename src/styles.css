@@ -1034,9 +1034,76 @@ button:hover {
 }
 
 .concept-list {
+  display: grid;
+  gap: 10px;
   margin: 0;
-  padding-left: 20px;
+  padding: 0;
+  list-style: none;
   line-height: 1.65;
+}
+
+.concept-list li {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 10px 0;
+  border-top: 1px solid rgba(21, 89, 78, 0.12);
+}
+
+.concept-list li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.concept-index {
+  display: inline-grid;
+  width: 32px;
+  height: 28px;
+  place-items: center;
+  border-radius: 8px;
+  background: #eef5f1;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.concept-depth {
+  margin-top: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.concept-depth summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  margin-bottom: 8px;
+  color: var(--teal);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.concept-depth summary::-webkit-details-marker {
+  display: none;
+}
+
+.concept-depth summary::after {
+  content: "+";
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 8px;
+  background: #eef5f1;
+  color: var(--teal);
+}
+
+.concept-depth[open] summary::after {
+  content: "-";
 }
 
 .command-bank {

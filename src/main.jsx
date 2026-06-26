@@ -789,6 +789,15 @@ function LaunchScreen({ saved, selectedIndex, onSelect }) {
 }
 
 function ConceptPanel({ module }) {
+  const primaryConcepts = module.concepts.slice(0, 2);
+  const depthConcepts = module.concepts.slice(2);
+  const renderConcepts = (concepts, offset = 0) => concepts.map((item, index) => (
+    <li key={item}>
+      <span className="concept-index">{String(index + offset + 1).padStart(2, "0")}</span>
+      <span>{item}</span>
+    </li>
+  ));
+
   return (
     <article className="study-panel panel-enter">
       <div className="panel-heading">
@@ -797,10 +806,16 @@ function ConceptPanel({ module }) {
       </div>
       <div className="callout">{module.summary}</div>
       <ul className="concept-list">
-        {module.concepts.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
+        {renderConcepts(primaryConcepts)}
       </ul>
+      {depthConcepts.length > 0 && (
+        <details className="concept-depth">
+          <summary>실무 관점 더 보기</summary>
+          <ul className="concept-list">
+            {renderConcepts(depthConcepts, primaryConcepts.length)}
+          </ul>
+        </details>
+      )}
       <div className="command-bank">
         <p className="eyebrow"><Command size={14} /> Command Bank</p>
         {module.commands.map((command) => (

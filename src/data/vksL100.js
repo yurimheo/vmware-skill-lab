@@ -16,6 +16,9 @@ export const vksL100 = {
         "Deployment는 원하는 Pod 복제본 수를 선언하고 ReplicaSet을 통해 상태를 유지합니다.",
         "Service는 Pod IP가 바뀌어도 안정적인 접근점을 제공합니다.",
         "Namespace는 리소스와 권한, 쿼터를 논리적으로 분리하는 기준입니다.",
+        "Label은 리소스를 묶는 이름표이고, Selector는 그 이름표를 기준으로 대상을 찾는 조건입니다.",
+        "Deployment, Service, Endpoint는 하나의 흐름으로 봐야 합니다. Deployment가 Pod를 만들고, Service가 Label로 Pod를 찾고, Endpoint가 실제 연결 대상을 보여줍니다.",
+        "Pod가 Running이어도 Service Endpoint가 비어 있으면 사용자는 애플리케이션에 접근하지 못할 수 있습니다.",
       ],
       commands: [
         "kubectl get pods -n <namespace>",
@@ -73,6 +76,9 @@ export const vksL100 = {
         "컨테이너는 호스트 OS 커널을 공유하면서 애플리케이션 프로세스를 격리합니다.",
         "VKS에서 Kubernetes Node는 vCenter상의 VM이고, Pod는 그 VM 위에서 실행됩니다.",
         "노드 장애는 Kubernetes와 vSphere 양쪽 관점에서 함께 확인해야 합니다.",
+        "Kubernetes는 Node를 추상 리소스로 보지만, VKS 운영자는 그 Node가 실제로 어떤 VM, 네트워크, 스토리지 위에 있는지 알아야 합니다.",
+        "컨테이너 장애는 Pod 로그와 이벤트에서 보이고, 노드 VM 장애는 vCenter 전원 상태, 리소스 압박, 네트워크 상태에서 드러날 수 있습니다.",
+        "VKS에서 장애를 볼 때는 애플리케이션 계층과 인프라 계층이 서로 끊어져 있지 않다는 점을 항상 기억해야 합니다.",
       ],
       commands: ["kubectl get nodes -o wide", "govc vm.info <vm-name>"],
       questions: [
@@ -117,6 +123,9 @@ export const vksL100 = {
         "vSphere Namespace는 권한, 리소스 쿼터, Storage Policy를 나누는 단위입니다.",
         "TKC는 vSphere Namespace 안에 배포되는 게스트 Kubernetes 클러스터입니다.",
         "Supervisor API Endpoint는 운영자가 Supervisor에 접속하는 진입점입니다.",
+        "Supervisor는 클러스터 생성을 관리하는 상위 계층이고, TKC는 실제 애플리케이션을 배포하는 워크로드 클러스터입니다.",
+        "vSphere Namespace는 Kubernetes Namespace와 이름은 비슷하지만, vCenter 권한과 VM Class, Storage Policy가 연결되는 vSphere 운영 경계입니다.",
+        "작업 전 현재 Context가 Supervisor인지 TKC인지 구분하지 못하면, 같은 kubectl 명령이라도 전혀 다른 계층을 조회하게 됩니다.",
       ],
       commands: [
         "kubectl vsphere login --server=<supervisor-api-endpoint> --vsphere-username <sso-user>",
@@ -166,6 +175,9 @@ export const vksL100 = {
         "vSphere Pod는 Supervisor 위에서 VM 격리 수준으로 실행되는 경량 컨테이너 방식입니다.",
         "TKC는 Control Plane VM과 Worker VM으로 구성되는 독립적인 Kubernetes 클러스터입니다.",
         "애플리케이션 Pod는 일반적으로 TKC Context에서 확인합니다.",
+        "Supervisor Context에서는 TKC, Namespace, VM Class 같은 플랫폼 리소스를 주로 다룹니다.",
+        "TKC Context에서는 Deployment, Service, Ingress, PVC 같은 일반 Kubernetes 애플리케이션 리소스를 다룹니다.",
+        "운영 사고를 줄이려면 명령을 치기 전에 현재 Context와 Namespace를 확인하는 습관이 중요합니다.",
       ],
       commands: ["kubectl config current-context", "kubectl config get-contexts", "kubectl get tkc -A", "kubectl get nodes"],
       questions: [
@@ -210,6 +222,9 @@ export const vksL100 = {
         "vSphere CSI는 PVC 요청을 vSphere CNS와 연결해 Persistent Volume을 생성합니다.",
         "StorageClass는 vSphere Storage Policy와 연결될 수 있습니다.",
         "PVC가 Pending이면 StorageClass, CSI, 데이터스토어, 접근 모드를 함께 확인합니다.",
+        "CNI 문제는 Pod 간 통신, Service 접근, NetworkPolicy 적용 문제로 나타나는 경우가 많습니다.",
+        "CSI 문제는 PVC Pending, Volume attach/mount 실패, Stateful 애플리케이션 기동 실패로 이어질 수 있습니다.",
+        "네트워크와 스토리지는 Kubernetes YAML만 봐서는 끝나지 않고, vSphere의 네트워크/스토리지 정책과 함께 확인해야 합니다.",
       ],
       commands: [
         "kubectl get pods -n vmware-system-antrea",
@@ -267,6 +282,9 @@ export const vksL100 = {
         "vSphere Standard만으로는 Workload Management 사용이 제한됩니다.",
         "vSphere Enterprise Plus, VCF, vSphere+ 계열에서는 VKS 사용이 가능합니다.",
         "Harbor, Contour, 모니터링 등 Add-on 범위는 Tanzu 에디션에 따라 달라질 수 있습니다.",
+        "라이선스는 단순히 메뉴 표시 여부만이 아니라, 활성화 가능한 기능과 지원 범위를 결정합니다.",
+        "고객 환경에서 VKS 가능 여부를 볼 때는 vSphere 버전, 라이선스, 클러스터 요구사항, Add-on 사용 범위를 함께 확인해야 합니다.",
+        "에디션 차이는 기술 구성뿐 아니라 운영 표준, 지원 경로, 확장 가능한 기능 범위에도 영향을 줍니다.",
       ],
       commands: ["vCenter > 관리 > 라이선스", "Workload Management 활성화 화면 확인"],
       questions: [
@@ -305,6 +323,9 @@ export const vksL100 = {
         "`logs`는 Pod 컨테이너 로그를 확인합니다.",
         "`exec`는 컨테이너 내부에서 명령을 실행합니다.",
         "`apply -f`는 YAML 매니페스트를 선언적으로 적용합니다.",
+        "`get`으로 상태를 넓게 보고, `describe`로 이벤트를 좁히고, `logs`로 애플리케이션 원인을 확인하는 흐름이 기본입니다.",
+        "`kubectl -n <namespace>`와 `kubectl get ... -n <namespace>`는 같은 의미로 자주 쓰이며, 실무에서는 별칭 `k`도 많이 사용합니다.",
+        "`diff`는 적용 전 변경 영향을 미리 보는 명령이고, 운영 환경에서는 `apply` 전에 변경 범위를 확인하는 습관이 중요합니다.",
       ],
       commands: [
         "kubectl config current-context",

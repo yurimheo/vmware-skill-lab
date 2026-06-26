@@ -14,6 +14,9 @@ export const vksL200 = {
         "Supervisor 활성화에는 지원 버전, 라이선스, 네트워크, Load Balancer, Storage Policy가 필요합니다.",
         "활성화가 완료되면 Supervisor API Endpoint가 생성됩니다.",
         "Control Plane VM 상태는 vCenter와 Kubernetes 양쪽에서 확인해야 합니다.",
+        "Workload Management 활성화는 단순한 기능 체크가 아니라 vSphere 클러스터를 Kubernetes 관리 계층으로 전환하는 작업입니다.",
+        "활성화 실패는 네트워크, VIP, DNS/NTP, Storage Policy, 호스트 호환성 중 어느 한 곳에서 발생할 수 있으므로 사전 점검 순서가 중요합니다.",
+        "Supervisor API Endpoint가 생겼다는 것은 kubectl로 관리 계층에 접근할 진입점이 생겼다는 의미입니다.",
       ],
       commands: [
         "kubectl vsphere login --server=<supervisor-api-endpoint> --vsphere-username <sso-user>",
@@ -60,6 +63,9 @@ export const vksL200 = {
         "Namespace에는 사용자/그룹 권한, CPU/Memory 제한, Storage Policy가 연결됩니다.",
         "권한은 개인보다 그룹 단위로 부여하는 편이 운영에 적합합니다.",
         "TKC 생성 권한과 Kubernetes 내부 RBAC는 서로 다른 계층입니다.",
+        "vSphere Namespace는 팀이나 서비스가 사용할 수 있는 인프라 자원의 울타리입니다.",
+        "VM Class는 사용자가 만들 수 있는 노드 VM의 크기와 성능 범위를 제한하는 기준입니다.",
+        "vSphere Namespace 권한은 TKC를 만들 수 있는 권한이고, TKC 내부에서 Pod를 만들 수 있는 권한은 Kubernetes RBAC로 다시 설계해야 합니다.",
       ],
       commands: [
         "kubectl get namespaces",
@@ -106,6 +112,9 @@ export const vksL200 = {
         "TKC YAML에는 Namespace, TKR, Control Plane, Worker nodePool 정보가 포함됩니다.",
         "Control Plane과 Worker는 vCenter에서 VM으로 생성됩니다.",
         "TKC 생성 실패 시 describe tkc의 Events를 먼저 확인합니다.",
+        "TKR은 TKC가 사용할 Kubernetes 릴리즈를 의미하며, 지원되는 버전 경로 안에서 선택해야 합니다.",
+        "Control Plane은 Kubernetes API와 클러스터 상태를 관리하고, Worker Node는 실제 애플리케이션 Pod를 실행합니다.",
+        "TKC 배포는 YAML 적용으로 끝나지 않고, VM 생성, Node Ready, CNI/CSI 준비까지 이어지는 긴 프로비저닝 흐름입니다.",
       ],
       commands: [
         "kubectl apply -f tkc.yaml",
@@ -159,6 +168,9 @@ export const vksL200 = {
         "`apply`는 선언형 리소스를 생성하거나 갱신합니다.",
         "배포 후에는 Pod Ready와 Service Endpoint까지 함께 봐야 합니다.",
         "Service Selector와 Pod Label이 맞지 않으면 Endpoint가 비어 있을 수 있습니다.",
+        "Deployment가 정상이어도 Service selector가 Pod label과 맞지 않으면 사용자는 애플리케이션에 접근하지 못합니다.",
+        "배포 검증은 `생성됨`이 아니라 `요청 경로가 Pod까지 닿음`을 확인하는 과정입니다.",
+        "앱 배포 후에는 Deployment, Pod, Service, Endpoint, logs를 한 흐름으로 확인하면 원인 범위를 빠르게 줄일 수 있습니다.",
       ],
       commands: [
         "kubectl apply -f app.yaml",
@@ -205,6 +217,9 @@ export const vksL200 = {
         "PVC가 생성되면 StorageClass를 기준으로 동적 프로비저닝이 수행됩니다.",
         "VKS에서는 vSphere CSI가 PVC와 CNS 볼륨을 연결합니다.",
         "PVC Pending은 StorageClass, CSI, 데이터스토어, 접근 모드를 함께 봐야 합니다.",
+        "StorageClass는 Kubernetes 사용자에게 보이는 스토리지 메뉴이고, 실제 정책은 vSphere Storage Policy와 연결됩니다.",
+        "PVC는 애플리케이션이 원하는 용량과 접근 모드를 요청하는 객체이며, PV는 그 요청에 실제로 바인딩된 볼륨입니다.",
+        "Stateful 애플리케이션은 스토리지 성능, 데이터 보호, 복구 요구사항을 먼저 정리한 뒤 StorageClass를 선택해야 합니다.",
       ],
       commands: [
         "kubectl get storageclass",
@@ -251,6 +266,9 @@ export const vksL200 = {
         "LoadBalancer Service는 L4 중심으로 VIP를 할당받습니다.",
         "Ingress는 Host/Path 기반 L7 라우팅을 제공합니다.",
         "접근 장애는 DNS, VIP, Ingress, Service, Endpoint, Pod 순서로 좁혀갑니다.",
+        "LoadBalancer는 IP와 포트 중심의 외부 노출이고, Ingress는 HTTP Host/Path 기준의 라우팅 계층입니다.",
+        "사용자 접속 실패는 애플리케이션 문제처럼 보여도 DNS, VIP, 인증서, 라우팅, Service selector 중 어느 계층에서도 발생할 수 있습니다.",
+        "외부 노출 설계에서는 IP/VIP 범위, DNS 운영 주체, TLS 인증서, 라우팅 정책을 배포 전에 합의해야 합니다.",
       ],
       commands: [
         "kubectl get svc -n <namespace>",
@@ -297,6 +315,9 @@ export const vksL200 = {
         "업그레이드 전 지원 경로, 백업, Add-on 호환성을 확인해야 합니다.",
         "Control Plane과 Worker 노드가 순차적으로 교체됩니다.",
         "업그레이드 중 TKC와 Node 상태를 Watch 모드로 확인합니다.",
+        "TKR 업그레이드는 단순 버전 변경이 아니라 Control Plane과 Worker 노드 교체를 동반하는 생명주기 작업입니다.",
+        "CNI, CSI, Ingress, 백업 도구 같은 Add-on이 새 Kubernetes 버전과 호환되는지 먼저 확인해야 합니다.",
+        "운영 환경에서는 업그레이드 계획에 영향 범위, 백업, 롤백 기준, 관측 지표, 변경 승인 시간을 포함해야 합니다.",
       ],
       commands: [
         "kubectl get tkr -A",
@@ -343,6 +364,9 @@ export const vksL200 = {
         "스케일 아웃 전 vSphere 리소스, VM Class, IP Pool 여유를 확인합니다.",
         "스케일 인 전 PDB와 중요 Pod 배치 상태를 확인합니다.",
         "노드가 Ready가 되어도 기존 Pod가 즉시 자동 분산되지 않을 수 있습니다.",
+        "노드 증설은 Kubernetes replicas 변경처럼 보여도 실제로는 vSphere VM, IP, 스토리지, 네트워크 자원을 더 사용하는 작업입니다.",
+        "스케일 인은 단순히 VM을 줄이는 것이 아니라 Pod eviction과 애플리케이션 가용성에 영향을 주는 작업입니다.",
+        "PDB는 스케일 인이나 업그레이드처럼 자발적 중단이 발생할 때 최소 가용성을 보호하는 안전장치입니다.",
       ],
       commands: [
         "kubectl get tkc <cluster-name> -n <namespace> -o yaml",
@@ -382,6 +406,9 @@ export const vksL200 = {
         "Pod Pending은 describe pod의 Events를 먼저 봅니다.",
         "CrashLoopBackOff는 logs --previous가 원인 확인에 유용합니다.",
         "Node NotReady는 Kubernetes 상태와 vCenter VM 상태를 함께 봐야 합니다.",
+        "Events는 Kubernetes가 왜 스케줄링, 이미지 Pull, 볼륨 마운트에 실패했는지 남기는 1차 단서입니다.",
+        "현재 로그만 보면 재시작 직전의 실패 원인을 놓칠 수 있어 CrashLoopBackOff에서는 `--previous`가 중요합니다.",
+        "장애 확인은 전체 현황(get), 상세 원인(describe), 애플리케이션 로그(logs), 인프라 상태(vCenter)를 연결하는 과정입니다.",
       ],
       commands: [
         "kubectl get pods -A",

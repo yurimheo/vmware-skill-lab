@@ -10,7 +10,13 @@ export const vksL300 = {
       title: "Supervisor Cluster와 Namespace 설계",
       shortTitle: "Namespace 설계",
       summary: "Namespace는 권한, 리소스, 스토리지, 네트워크 정책이 만나는 운영 경계입니다.",
-      concepts: ["팀/서비스/환경 기준으로 Namespace를 분리합니다.", "ResourceQuota와 Storage Policy를 업무 중요도에 맞게 설계합니다."],
+      concepts: [
+        "팀/서비스/환경 기준으로 Namespace를 분리합니다.",
+        "ResourceQuota와 Storage Policy를 업무 중요도에 맞게 설계합니다.",
+        "Namespace는 이름 공간이 아니라 권한, 자원, 스토리지, 네트워크 정책이 만나는 운영 경계입니다.",
+        "멀티테넌시에서는 Namespace 분리만으로 충분하지 않고 RBAC, ResourceQuota, NetworkPolicy, 이미지 공급망 통제가 함께 필요합니다.",
+        "좋은 Namespace 설계는 장애 범위와 비용 책임, 변경 승인 범위를 서비스 단위로 좁혀줍니다.",
+      ],
       commands: ["kubectl get resourcequota -A", "kubectl get networkpolicy -A"],
       questions: [
         {
@@ -34,7 +40,13 @@ export const vksL300 = {
       title: "VKS 생명주기 관리",
       shortTitle: "생명주기",
       summary: "TKR 업그레이드, 노드 스케일링, VM Class 변경은 호환성과 운영 영향을 함께 봐야 합니다.",
-      concepts: ["업그레이드 전 Add-on 호환성과 백업을 확인합니다.", "스케일 인은 PDB와 Pod Eviction 영향을 확인해야 합니다."],
+      concepts: [
+        "업그레이드 전 Add-on 호환성과 백업을 확인합니다.",
+        "스케일 인은 PDB와 Pod Eviction 영향을 확인해야 합니다.",
+        "VKS 생명주기 관리는 버전 변경이 아니라 Control Plane, Worker VM, Add-on, 애플리케이션 가용성을 함께 움직이는 작업입니다.",
+        "TKR 업그레이드, VM Class 변경, 노드 스케일링은 모두 vSphere 리소스와 Kubernetes 스케줄링에 영향을 줍니다.",
+        "운영 환경에서는 유지보수 창, 사전 백업, canary 검증, 롤백 기준, 관측 지표를 먼저 정해야 합니다.",
+      ],
       commands: ["kubectl get tkr -A", "kubectl get tkc -A", "kubectl get nodes -w"],
       questions: [
         {
@@ -65,7 +77,13 @@ export const vksL300 = {
       title: "StorageClass 및 PVC 고급 운영",
       shortTitle: "스토리지 고급",
       summary: "vSphere CNS, Storage Policy, RWO/RWX, Snapshot을 함께 이해해야 합니다.",
-      concepts: ["PVC는 vSphere CSI를 통해 CNS 볼륨과 연결됩니다.", "RWX 요구사항은 File Service 또는 지원 스토리지 구성을 확인해야 합니다."],
+      concepts: [
+        "PVC는 vSphere CSI를 통해 CNS 볼륨과 연결됩니다.",
+        "RWX 요구사항은 File Service 또는 지원 스토리지 구성을 확인해야 합니다.",
+        "PVC Pending은 프로비저닝 실패이고, PVC Bound 이후 mount 실패는 노드 측 CSI나 vSphere 볼륨 연결 문제일 가능성이 큽니다.",
+        "StorageClass는 사용자가 선택하는 메뉴처럼 보이지만 실제로는 vSphere Storage Policy, 데이터스토어, 성능/가용성 요구사항과 연결됩니다.",
+        "Stateful 워크로드는 백업, 스냅샷, 복구 순서, 애플리케이션 정합성까지 포함해 설계해야 합니다.",
+      ],
       commands: ["kubectl get pvc,pv -A", "kubectl get volumesnapshot -A"],
       questions: [
         {
@@ -103,7 +121,13 @@ export const vksL300 = {
       title: "NSX 기반 vs VDS 기반 네트워크",
       shortTitle: "네트워크 설계",
       summary: "NSX 기반은 보안/가상화 기능이 강하고, VDS 기반은 구성이 상대적으로 단순합니다.",
-      concepts: ["네트워크 선택은 기능뿐 아니라 운영팀의 관리 가능성을 함께 봐야 합니다.", "외부 노출 환경은 VIP, DNS, 인증서 기준을 먼저 정리합니다."],
+      concepts: [
+        "네트워크 선택은 기능뿐 아니라 운영팀의 관리 가능성을 함께 봐야 합니다.",
+        "외부 노출 환경은 VIP, DNS, 인증서 기준을 먼저 정리합니다.",
+        "NSX 기반은 네트워크 가상화와 보안 정책 연계가 강하고, VDS 기반은 구조가 단순해 운영 복잡도가 낮을 수 있습니다.",
+        "사용자 접속 장애는 Pod 문제가 아니라 DNS, VIP, 인증서, Ingress, Service, Endpoint, CNI 중 어느 계층에서도 발생할 수 있습니다.",
+        "네트워크 장애 분석은 Underlay, Overlay, 정책, Load Balancer, 애플리케이션 라우팅을 분리해서 보는 습관이 중요합니다.",
+      ],
       commands: ["kubectl get svc -A", "kubectl get ingress -A"],
       questions: [
         {
@@ -127,7 +151,13 @@ export const vksL300 = {
       title: "Add-on 패키지 구성 및 배포",
       shortTitle: "Add-on",
       summary: "Harbor, Contour, Prometheus 같은 Add-on은 설치보다 버전과 운영 기준이 중요합니다.",
-      concepts: ["Add-on은 Kubernetes 버전과 호환성을 확인해야 합니다.", "GitOps로 관리하면 환경 간 차이를 줄일 수 있습니다."],
+      concepts: [
+        "Add-on은 Kubernetes 버전과 호환성을 확인해야 합니다.",
+        "GitOps로 관리하면 환경 간 차이를 줄일 수 있습니다.",
+        "Add-on은 설치 후에도 업그레이드, 설정 백업, 장애 영향 범위, 롤백 절차까지 운영 기준이 필요합니다.",
+        "Ingress, Harbor, Prometheus 같은 Add-on은 플랫폼 공용 기능이므로 장애가 여러 애플리케이션에 동시에 영향을 줄 수 있습니다.",
+        "운영 Add-on은 버전, values, Namespace, 권한, 모니터링 기준을 코드로 남기는 편이 안전합니다.",
+      ],
       commands: ["kubectl get package -A", "kubectl get pods -A"],
       questions: [
         {
@@ -151,7 +181,13 @@ export const vksL300 = {
       title: "VKS RBAC와 vSphere SSO 그룹 연동",
       shortTitle: "RBAC/SSO",
       summary: "SSO 그룹, Namespace 권한, Kubernetes RBAC를 분리해서 설계합니다.",
-      concepts: ["인증과 권한은 다릅니다.", "Role은 Namespace 범위, ClusterRole은 클러스터 범위 권한입니다."],
+      concepts: [
+        "인증과 권한은 다릅니다.",
+        "Role은 Namespace 범위, ClusterRole은 클러스터 범위 권한입니다.",
+        "SSO나 OIDC로 로그인에 성공해도 Kubernetes RBAC가 없으면 리소스 작업은 거부될 수 있습니다.",
+        "운영 권한은 개인보다 SSO 그룹 기준으로 부여해야 입사, 이동, 퇴사 시 권한 회수가 쉬워집니다.",
+        "`kubectl auth can-i`는 사용자가 실제로 어떤 작업을 할 수 있는지 검증하는 가장 직접적인 방법입니다.",
+      ],
       commands: ["kubectl get rolebinding -A", "kubectl get clusterrolebinding"],
       questions: [
         {
@@ -175,7 +211,13 @@ export const vksL300 = {
       title: "OIDC 배포 및 Supervisor 연동",
       shortTitle: "OIDC",
       summary: "OIDC는 외부 ID Provider와 Kubernetes 인증을 연동하는 방식입니다.",
-      concepts: ["OIDC는 인증을 담당하고 실제 접근 권한은 RBAC가 담당합니다.", "Issuer URL, Client ID, Group Claim, CA 신뢰를 확인합니다."],
+      concepts: [
+        "OIDC는 인증을 담당하고 실제 접근 권한은 RBAC가 담당합니다.",
+        "Issuer URL, Client ID, Group Claim, CA 신뢰를 확인합니다.",
+        "OIDC 장애는 로그인 실패, 그룹 매핑 누락, 토큰 클레임 불일치, 인증서 신뢰 문제로 나눠서 봐야 합니다.",
+        "그룹 Claim이 RBAC 바인딩과 맞지 않으면 사용자는 인증됐지만 권한이 없는 상태가 됩니다.",
+        "운영자는 IdP 설정과 Kubernetes RBAC를 같은 변경 흐름 안에서 관리해야 합니다.",
+      ],
       commands: ["kubectl config view", "kubectl auth can-i get pods -n <namespace>"],
       questions: [
         {
@@ -199,7 +241,13 @@ export const vksL300 = {
       title: "Harbor Registry와 이미지 보안",
       shortTitle: "Harbor 보안",
       summary: "Harbor는 이미지 저장소이자 취약점 스캔, 프로젝트 격리, Robot Account 운영 지점입니다.",
-      concepts: ["운영 이미지는 명시적 버전 태그를 사용하는 것이 좋습니다.", "CI/CD는 Robot Account에 최소 권한을 부여합니다."],
+      concepts: [
+        "운영 이미지는 명시적 버전 태그를 사용하는 것이 좋습니다.",
+        "CI/CD는 Robot Account에 최소 권한을 부여합니다.",
+        "Harbor Project는 팀, 서비스, 환경별 이미지 접근 범위를 나누는 보안 경계로 사용할 수 있습니다.",
+        "취약점 스캔 결과는 배포 차단 기준, 예외 승인, 패치 책임자까지 정해져야 실무에서 힘을 가집니다.",
+        "ImagePullBackOff는 이미지 이름, 태그, Registry 인증, 네트워크, 인증서 신뢰 문제를 순서대로 확인해야 합니다.",
+      ],
       commands: ["docker login <registry>", "kubectl describe pod <pod-name> -n <namespace>"],
       questions: [
         {
@@ -223,7 +271,13 @@ export const vksL300 = {
       title: "Cluster API 기반 인프라 자동화",
       shortTitle: "CAPI",
       summary: "Cluster API는 클러스터와 노드 생명주기를 Kubernetes 리소스로 관리합니다.",
-      concepts: ["Cluster, Machine, MachineDeployment가 핵심 리소스입니다.", "GitOps와 결합하면 클러스터 변경 이력을 코드로 남길 수 있습니다."],
+      concepts: [
+        "Cluster, Machine, MachineDeployment가 핵심 리소스입니다.",
+        "GitOps와 결합하면 클러스터 변경 이력을 코드로 남길 수 있습니다.",
+        "Cluster API는 인프라 생명주기를 Kubernetes 리소스로 표현해 클러스터 생성과 노드 교체를 선언형으로 관리합니다.",
+        "Machine 상태가 막히면 단순 Pod 문제가 아니라 VM 생성, 네트워크, 이미지, 부트스트랩 단계 중 어디서 멈췄는지 확인해야 합니다.",
+        "CAPI 자동화는 편리하지만 잘못된 Manifest가 여러 클러스터에 반복 적용될 수 있어 리뷰와 승인 흐름이 중요합니다.",
+      ],
       commands: ["kubectl get cluster -A", "kubectl get machine -A"],
       questions: [
         {
@@ -247,7 +301,13 @@ export const vksL300 = {
       title: "GitOps 기반 플랫폼 구성",
       shortTitle: "GitOps 플랫폼",
       summary: "Git을 운영 상태의 기준으로 삼아 클러스터, Add-on, 정책을 선언형으로 관리합니다.",
-      concepts: ["GitOps는 실제 상태와 Git 상태의 차이를 탐지합니다.", "Application과 Project 기준을 표준화해야 합니다."],
+      concepts: [
+        "GitOps는 실제 상태와 Git 상태의 차이를 탐지합니다.",
+        "Application과 Project 기준을 표준화해야 합니다.",
+        "Git은 운영 상태의 기준이 되므로 누가 어떤 변경을 왜 했는지 추적할 수 있어야 합니다.",
+        "플랫폼 GitOps는 Add-on, 정책, Namespace, RBAC처럼 공용 기준을 다루고 앱 GitOps는 서비스 배포 흐름을 다룹니다.",
+        "Project 표준은 배포 대상, 저장소 범위, 권한, Sync 정책을 팀 단위로 통제하는 기준입니다.",
+      ],
       commands: ["kubectl get applications -A", "kubectl get appproject -A"],
       questions: [
         {
@@ -271,7 +331,13 @@ export const vksL300 = {
       title: "GitOps 기반 앱 배포 자동화",
       shortTitle: "앱 GitOps",
       summary: "Argo CD 또는 Flux를 사용해 앱 Manifest, Helm, Kustomize 배포를 자동화합니다.",
-      concepts: ["자동 Sync와 수동 Sync는 운영 위험도에 따라 선택합니다.", "Manifest 품질이 배포 안정성을 좌우합니다."],
+      concepts: [
+        "자동 Sync와 수동 Sync는 운영 위험도에 따라 선택합니다.",
+        "Manifest 품질이 배포 안정성을 좌우합니다.",
+        "GitOps 앱 배포에서 Drift는 Git에 선언된 목표 상태와 실제 클러스터 상태가 달라진 상태입니다.",
+        "자동 Sync는 빠른 복구에 유리하지만 잘못된 변경도 빠르게 반영될 수 있어 환경별 정책이 필요합니다.",
+        "Helm values, Kustomize overlay, Secret 관리 방식이 정리되지 않으면 환경별 차이가 장애 원인이 됩니다.",
+      ],
       commands: ["kubectl get applications -n argocd", "kubectl describe application <app-name> -n argocd"],
       questions: [
         {
@@ -295,7 +361,13 @@ export const vksL300 = {
       title: "NSX ALB / Avi + AKO 연동",
       shortTitle: "Avi/AKO",
       summary: "AKO는 Kubernetes Service/Ingress를 Avi Virtual Service로 동기화합니다.",
-      concepts: ["Avi Controller는 제어 평면, Service Engine은 트래픽 처리 계층입니다.", "Service Pending은 AKO 로그와 VIP Pool을 확인합니다."],
+      concepts: [
+        "Avi Controller는 제어 평면, Service Engine은 트래픽 처리 계층입니다.",
+        "Service Pending은 AKO 로그와 VIP Pool을 확인합니다.",
+        "AKO는 Kubernetes Service/Ingress를 감지해 Avi Virtual Service와 Pool 객체로 동기화하는 컨트롤러입니다.",
+        "VIP가 할당되지 않으면 Service 정의, annotation, AKO 로그, VIP Pool, Avi Controller 이벤트를 함께 확인합니다.",
+        "Ingress가 생성됐는데 외부 접속이 안 되면 IngressClass, TLS Secret, Avi 객체 생성, Pool member 상태를 순서대로 봅니다.",
+      ],
       commands: ["kubectl get pods -n avi-system", "kubectl logs -n avi-system deploy/ako"],
       questions: [
         {
@@ -333,7 +405,13 @@ export const vksL300 = {
       title: "External DNS 서비스 구성",
       shortTitle: "External DNS",
       summary: "External DNS는 Service/Ingress 정보를 기반으로 DNS 레코드를 자동 관리합니다.",
-      concepts: ["Domain Filter로 관리 범위를 제한해야 합니다.", "DNS Provider 권한과 TTL을 함께 고려합니다."],
+      concepts: [
+        "Domain Filter로 관리 범위를 제한해야 합니다.",
+        "DNS Provider 권한과 TTL을 함께 고려합니다.",
+        "External DNS는 Kubernetes 리소스 변화를 실제 DNS Provider 변경으로 연결하므로 권한 범위를 좁혀야 합니다.",
+        "잘못된 annotation이나 Domain Filter 누락은 예상하지 않은 DNS 레코드 생성/삭제로 이어질 수 있습니다.",
+        "DNS 장애는 레코드 생성 여부, TTL 전파, Provider 권한, Ingress/Service annotation, 외부 해석 결과를 함께 확인합니다.",
+      ],
       commands: ["kubectl get pods -n external-dns", "kubectl logs -n external-dns deploy/external-dns"],
       questions: [
         {
@@ -364,7 +442,13 @@ export const vksL300 = {
       title: "VM 서비스 L7 제공",
       shortTitle: "VM L7",
       summary: "VM 기반 서비스에도 선언형 운영과 L7 접근 정책을 적용할 수 있습니다.",
-      concepts: ["VM 서비스는 컨테이너 앱과 생명주기가 다릅니다.", "DNS, VIP, 인증서, 라우팅 정책을 함께 관리해야 합니다."],
+      concepts: [
+        "VM 서비스는 컨테이너 앱과 생명주기가 다릅니다.",
+        "DNS, VIP, 인증서, 라우팅 정책을 함께 관리해야 합니다.",
+        "VM 기반 서비스는 OS 패치, 재부팅, 백업, 에이전트 관리 책임이 컨테이너 앱과 다를 수 있습니다.",
+        "L7 제공은 단순 노출이 아니라 인증서, Host/Path 라우팅, 헬스 체크, 장애 조치 기준까지 포함합니다.",
+        "VM과 컨테이너 서비스를 함께 운영할수록 공통 접근 정책과 예외 처리 기준이 중요해집니다.",
+      ],
       commands: ["kubectl get virtualmachine -A", "kubectl get svc,ingress -A"],
       questions: [
         {
@@ -388,7 +472,13 @@ export const vksL300 = {
       title: "VCF-A All Apps Mode와 VKS Management",
       shortTitle: "VCF-A",
       summary: "VM과 컨테이너 앱을 통합 운영하며 접근 제어, 이미지, 네트워크 정책을 일관되게 관리합니다.",
-      concepts: ["VM 중심 운영과 Kubernetes 중심 운영의 책임 경계를 나눠야 합니다.", "중앙 정책 기준을 우선하고 클러스터별 예외를 줄입니다."],
+      concepts: [
+        "VM 중심 운영과 Kubernetes 중심 운영의 책임 경계를 나눠야 합니다.",
+        "중앙 정책 기준을 우선하고 클러스터별 예외를 줄입니다.",
+        "All Apps 운영은 VM과 컨테이너를 같은 플랫폼 정책 아래에서 보되 생명주기 차이를 인정하는 방식입니다.",
+        "통합 운영에서는 네트워크, 이미지, 접근 제어, 관측성 기준을 서비스 유형과 무관하게 맞추는 것이 중요합니다.",
+        "예외가 많아질수록 장애 대응과 감사가 어려워지므로 공통 표준과 예외 승인 절차가 필요합니다.",
+      ],
       commands: ["kubectl get namespaces", "kubectl get networkpolicy -A"],
       questions: [
         {
@@ -412,7 +502,13 @@ export const vksL300 = {
       title: "GPU 노드 풀 구성",
       shortTitle: "GPU 노드",
       summary: "GPU 워크로드는 GPU Operator, 드라이버, Node Label/Taint, RuntimeClass를 함께 봅니다.",
-      concepts: ["GPU 노드는 일반 워크로드와 분리되도록 taint를 사용할 수 있습니다.", "에어갭 환경은 이미지와 드라이버 반입 절차가 중요합니다."],
+      concepts: [
+        "GPU 노드는 일반 워크로드와 분리되도록 taint를 사용할 수 있습니다.",
+        "에어갭 환경은 이미지와 드라이버 반입 절차가 중요합니다.",
+        "GPU 워크로드는 노드 하드웨어, 드라이버, Device Plugin, RuntimeClass, 스케줄링 조건이 모두 맞아야 실행됩니다.",
+        "Node Label과 Taint/Toleration은 비싼 GPU 자원이 일반 워크로드에 낭비되지 않게 하는 기본 장치입니다.",
+        "GPU 장애는 Pod 이벤트뿐 아니라 드라이버 상태, Operator Pod, 노드 리소스 광고 상태를 함께 확인해야 합니다.",
+      ],
       commands: ["kubectl get nodes --show-labels", "kubectl get pods -n gpu-operator"],
       questions: [
         {
@@ -436,7 +532,13 @@ export const vksL300 = {
       title: "Persistent Volume 백업/복구",
       shortTitle: "백업/복구",
       summary: "Velero는 Kubernetes 리소스와 PV를 백업/복구하며 CSI Snapshot과 연동할 수 있습니다.",
-      concepts: ["백업은 성공보다 복구 검증이 더 중요합니다.", "Stateful 앱은 애플리케이션 정합성을 고려해야 합니다."],
+      concepts: [
+        "백업은 성공보다 복구 검증이 더 중요합니다.",
+        "Stateful 앱은 애플리케이션 정합성을 고려해야 합니다.",
+        "Velero는 Kubernetes 리소스와 PV 데이터를 함께 다룰 수 있지만 모든 앱이 같은 방식으로 복구되는 것은 아닙니다.",
+        "복구 순서는 Namespace/RBAC/Secret/ConfigMap, PVC/PV, Deployment/StatefulSet, 외부 노출 순서로 생각하면 원인 분리가 쉽습니다.",
+        "백업 정책은 RPO, RTO, 보관 기간, 암호화, 복구 리허설 주기까지 포함해야 운영 기준이 됩니다.",
+      ],
       commands: ["velero backup get", "velero restore get", "kubectl get volumesnapshot -A"],
       questions: [
         {
@@ -467,7 +569,13 @@ export const vksL300 = {
       title: "Observability 스택",
       shortTitle: "관측성",
       summary: "Kubernetes 메트릭과 vSphere 인프라 메트릭을 함께 봐야 합니다.",
-      concepts: ["Pod, Node, CNI, CSI, Load Balancer, vSphere 지표를 연결해서 봅니다.", "알림은 대응 가능한 기준으로 설계합니다."],
+      concepts: [
+        "Pod, Node, CNI, CSI, Load Balancer, vSphere 지표를 연결해서 봅니다.",
+        "알림은 대응 가능한 기준으로 설계합니다.",
+        "VKS 관측성은 Kubernetes 상태와 vSphere VM, 스토리지, 네트워크 지표를 한 흐름으로 연결해야 합니다.",
+        "사용자 증상은 느림, 접속 실패, 배포 실패처럼 보이지만 원인은 Pod, Node, CSI, CNI, LB, 데이터스토어 어디에나 있을 수 있습니다.",
+        "좋은 알림은 단순 수치 초과가 아니라 담당자, 영향 범위, 다음 확인 명령까지 이어지는 형태입니다.",
+      ],
       commands: ["kubectl top nodes", "kubectl top pods -A"],
       questions: [
         {
@@ -498,7 +606,13 @@ export const vksL300 = {
       title: "Grafana 대시보드 구성",
       shortTitle: "Grafana",
       summary: "대시보드는 보기 좋은 차트보다 장애 판단에 도움이 되는 구조가 중요합니다.",
-      concepts: ["클러스터, Namespace, 스토리지, 네트워크 패널을 구분합니다.", "Runbook 링크와 임계치 기준을 함께 제공하면 좋습니다."],
+      concepts: [
+        "클러스터, Namespace, 스토리지, 네트워크 패널을 구분합니다.",
+        "Runbook 링크와 임계치 기준을 함께 제공하면 좋습니다.",
+        "대시보드는 예쁜 차트 모음이 아니라 장애를 계층별로 좁혀가는 탐색 지도여야 합니다.",
+        "상단에는 서비스 영향과 클러스터 건강도를, 하단에는 Pod/Node/Storage/Network/LB 세부 지표를 배치하면 판단이 빨라집니다.",
+        "Runbook 링크, 최근 변경 링크, 담당 팀 정보를 붙이면 알림에서 조치까지의 시간이 줄어듭니다.",
+      ],
       commands: ["kubectl get svc -A | grep grafana", "kubectl get configmap -A"],
       questions: [
         {
@@ -522,7 +636,13 @@ export const vksL300 = {
       title: "Prometheus 메트릭 조회",
       shortTitle: "PromQL",
       summary: "PromQL로 rate, increase, label 집계, Pending PVC 같은 운영 질문을 표현합니다.",
-      concepts: ["PromQL은 Label 품질에 크게 의존합니다.", "알림 쿼리는 시간 범위와 for 조건으로 흔들림을 줄입니다."],
+      concepts: [
+        "PromQL은 Label 품질에 크게 의존합니다.",
+        "알림 쿼리는 시간 범위와 for 조건으로 흔들림을 줄입니다.",
+        "rate는 초당 변화율, increase는 일정 시간 동안의 증가량을 볼 때 주로 사용합니다.",
+        "Label 집계 기준이 잘못되면 서비스별 장애인지 클러스터 전체 장애인지 판단이 흐려집니다.",
+        "알림 쿼리는 실제 운영자가 조치할 수 있는 질문으로 바꿔 표현해야 합니다.",
+      ],
       commands: ["rate(container_cpu_usage_seconds_total[5m])", "increase(kube_pod_container_status_restarts_total[15m])"],
       questions: [
         {
@@ -546,7 +666,13 @@ export const vksL300 = {
       title: "vSphere Three Zone 기반 VKS",
       shortTitle: "Three Zone",
       summary: "Three Zone 구성은 장애 도메인 분리로 클러스터 가용성을 높입니다.",
-      concepts: ["Zone은 전원, 네트워크, 스토리지 장애 도메인을 반영해야 합니다.", "Control Plane quorum과 Pod 분산 정책을 함께 봅니다."],
+      concepts: [
+        "Zone은 전원, 네트워크, 스토리지 장애 도메인을 반영해야 합니다.",
+        "Control Plane quorum과 Pod 분산 정책을 함께 봅니다.",
+        "Three Zone 설계의 목적은 단일 장애 도메인이 전체 클러스터 가용성을 무너뜨리지 않게 하는 것입니다.",
+        "Control Plane은 quorum을 유지할 수 있게 분산하고, 애플리케이션은 topology spread와 anti-affinity를 함께 고려합니다.",
+        "Zone 설계는 노드 배치뿐 아니라 스토리지 접근성, Load Balancer 경로, 운영 복구 절차까지 포함합니다.",
+      ],
       commands: ["kubectl get nodes --show-labels", "kubectl get pods -A -o wide"],
       questions: [
         {
@@ -570,7 +696,13 @@ export const vksL300 = {
       title: "vSAN 확장 클러스터 기반 VKS",
       shortTitle: "vSAN 확장",
       summary: "vSAN 확장 클러스터에서는 사이트 장애, 지연, Storage Policy, 노드 배치를 함께 설계합니다.",
-      concepts: ["Pod 위치와 스토리지 데이터 위치가 멀어지면 성능 영향이 생길 수 있습니다.", "사이트 장애 시 Volume 접근 가능성을 검증해야 합니다."],
+      concepts: [
+        "Pod 위치와 스토리지 데이터 위치가 멀어지면 성능 영향이 생길 수 있습니다.",
+        "사이트 장애 시 Volume 접근 가능성을 검증해야 합니다.",
+        "vSAN 확장 클러스터에서는 사이트 간 지연과 데이터 위치가 애플리케이션 성능에 직접 영향을 줄 수 있습니다.",
+        "Storage Policy는 장애 허용 방식과 데이터 배치 기준을 결정하므로 워크로드 중요도와 함께 선택해야 합니다.",
+        "사이트 장애 테스트는 Pod 재스케줄링, Volume attach, DNS/LB 경로, 복구 시간을 함께 검증해야 합니다.",
+      ],
       commands: ["kubectl get pvc,pv -A", "kubectl get pods -A -o wide"],
       questions: [
         {
@@ -594,7 +726,13 @@ export const vksL300 = {
       title: "VKS 멀티테넌시 설계",
       shortTitle: "멀티테넌시",
       summary: "멀티테넌시는 Namespace뿐 아니라 권한, 네트워크, 리소스, 이미지, 감사 로그를 함께 설계합니다.",
-      concepts: ["Namespace만 나누면 멀티테넌시가 완성되지 않습니다.", "Harbor Project와 RBAC, NetworkPolicy를 함께 연결합니다."],
+      concepts: [
+        "Namespace만 나누면 멀티테넌시가 완성되지 않습니다.",
+        "Harbor Project와 RBAC, NetworkPolicy를 함께 연결합니다.",
+        "멀티테넌시는 서로 다른 팀이 같은 플랫폼을 써도 권한, 네트워크, 자원, 이미지가 섞이지 않게 만드는 설계입니다.",
+        "ResourceQuota는 자원 남용을 막고, NetworkPolicy는 서비스 간 통신 범위를 제한하며, RBAC는 작업 권한을 통제합니다.",
+        "감사 로그와 변경 이력까지 연결해야 누가 어떤 테넌트에서 어떤 작업을 했는지 추적할 수 있습니다.",
+      ],
       commands: ["kubectl get quota -A", "kubectl get networkpolicy -A", "kubectl get rolebinding -A"],
       questions: [
         {
@@ -618,7 +756,13 @@ export const vksL300 = {
       title: "Supervisor 활성화 실패 분석",
       shortTitle: "Supervisor 장애",
       summary: "Supervisor 활성화 실패는 vCenter, ESXi, 네트워크, LB, DNS/NTP, Storage Policy를 계층별로 봅니다.",
-      concepts: ["vCenter Recent Tasks와 Events는 초기 원인 파악에 유용합니다.", "VIP 할당 실패는 Avi/NSX 계층을 먼저 확인해야 할 수 있습니다."],
+      concepts: [
+        "vCenter Recent Tasks와 Events는 초기 원인 파악에 유용합니다.",
+        "VIP 할당 실패는 Avi/NSX 계층을 먼저 확인해야 할 수 있습니다.",
+        "Supervisor 활성화는 vCenter, ESXi, 네트워크, Load Balancer, DNS/NTP, Storage Policy가 모두 준비되어야 성공합니다.",
+        "활성화 실패는 어느 단계에서 멈췄는지 먼저 잡고, 그 다음 해당 계층의 로그와 이벤트로 좁혀가야 합니다.",
+        "DNS, NTP, 인증서 문제는 API Endpoint 접속 실패나 Control Plane 통신 실패처럼 보일 수 있습니다.",
+      ],
       commands: ["kubectl get nodes", "kubectl get events -A --sort-by='.lastTimestamp'"],
       questions: [
         {
@@ -656,7 +800,13 @@ export const vksL300 = {
       title: "TKG 워크로드 클러스터 Node NotReady 분석",
       shortTitle: "Node NotReady",
       summary: "Node NotReady는 kubelet, CNI, 인증서, VM 전원, 리소스 압박을 함께 확인합니다.",
-      concepts: ["Kubernetes Node 상태와 vCenter VM 상태를 함께 봅니다.", "NetworkUnavailable이면 CNI/Antrea 상태를 확인합니다."],
+      concepts: [
+        "Kubernetes Node 상태와 vCenter VM 상태를 함께 봅니다.",
+        "NetworkUnavailable이면 CNI/Antrea 상태를 확인합니다.",
+        "Node NotReady는 kubelet, 컨테이너 런타임, CNI, 인증서, 시간 동기화, VM 전원/리소스 문제로 나눠서 봐야 합니다.",
+        "Node Conditions는 Ready, MemoryPressure, DiskPressure, PIDPressure, NetworkUnavailable처럼 문제의 방향을 알려줍니다.",
+        "VKS에서 노드는 VM이므로 Kubernetes 이벤트와 vCenter VM 상태, 호스트 리소스, 네트워크 연결을 함께 확인해야 합니다.",
+      ],
       commands: ["kubectl get nodes -o wide", "kubectl describe node <node-name>", "kubectl get pods -n vmware-system-antrea"],
       questions: [
         {
