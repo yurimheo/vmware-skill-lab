@@ -2,14 +2,21 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ArrowRight,
+  BarChart3,
+  BookOpen,
   CheckCircle2,
   ChevronRight,
   ClipboardList,
+  Command,
   GraduationCap,
+  Layers3,
   RotateCcw,
   Shuffle,
   SkipForward,
+  Target,
   Terminal,
+  Trophy,
+  XCircle,
 } from "lucide-react";
 import { vksTracks } from "./data/vksTracks";
 import "./styles.css";
@@ -253,6 +260,8 @@ function App() {
   const progress = getProgress();
   const progressPercent = progress.total ? Math.round((progress.completed / progress.total) * 100) : 0;
   const scorePercent = score.total ? Math.round((score.correct / score.total) * 100) : 0;
+  const activeModuleScore = getModuleScore(currentModule);
+  const activeModulePercent = activeModuleScore.total ? Math.round((activeModuleScore.completed / activeModuleScore.total) * 100) : 0;
   const weakModules = selectedTrack.modules
     .map((module) => ({ module, score: getModuleScore(module) }))
     .filter(({ score }) => score.total && Math.round((score.correct / score.total) * 100) < 70);
@@ -342,6 +351,7 @@ function App() {
           <div>
             <p className="eyebrow">Interactive VMware Learning</p>
             <h2>{selectedTrack.title}</h2>
+            <p className="topbar-subtitle">{selectedTrack.description}</p>
           </div>
           <div className="score-pill">
             <span>정답</span>
@@ -351,13 +361,24 @@ function App() {
           </div>
         </header>
 
+        <DashboardStrip
+          mode={mode}
+          progressPercent={progressPercent}
+          scorePercent={scorePercent}
+          progress={progress}
+          score={score}
+          currentModule={currentModule}
+          activeModuleScore={activeModuleScore}
+          activeModulePercent={activeModulePercent}
+        />
+
         <section className="hero-panel">
           <div>
-            <p className="eyebrow">MVP Scope</p>
-            <h3>{selectedTrack.label}을 퀴즈와 커맨드 실습으로 점검합니다.</h3>
+            <p className="eyebrow">Learning Path</p>
+            <h3>{selectedTrack.label} 실무 판단력을 단계별로 점검합니다.</h3>
             <p>
-              {selectedTrack.description} 문제 순서는 Focus 모드에서 매번 섞이며,
-              결과에서 부족한 영역과 오답 리뷰를 확인합니다.
+              개념 브리프를 먼저 훑고 바로 문제를 풀어보세요. Focus 모드는 전체 문항을 섞어 실전 점검처럼 진행하고,
+              결과 리포트에서 약한 모듈과 오답을 다시 볼 수 있습니다.
             </p>
           </div>
           <div className="hero-actions">
@@ -369,6 +390,17 @@ function App() {
             </button>
           </div>
         </section>
+
+        <ModuleOverview
+          modules={selectedTrack.modules}
+          activeModuleId={currentModule.id}
+          getModuleScore={getModuleScore}
+          onSelect={(index) => {
+            setMode("learn");
+            setModuleIndex(index);
+            setQuestionIndex(0);
+          }}
+        />
 
         <section className="content-grid">
           {mode === "learn" && (
@@ -408,6 +440,78 @@ function App() {
         )}
       </main>
     </div>
+  );
+}
+
+function DashboardStrip({ mode, progressPercent, scorePercent, progress, score, currentModule, activeModuleScore, activeModulePercent }) {
+  return (
+    <section className="dashboard-strip" aria-label="Learning status">
+      <StatusMetric
+        icon={<Target size={18} />}
+        label="진행률"
+        value={`${progressPercent}%`}
+        detail={`${progress.completed}/${progress.total} completed`}
+        tone="blue"
+      />
+      <StatusMetric
+        icon={<Trophy size={18} />}
+        label="정답률"
+        value={`${scorePercent}%`}
+        detail={`${score.correct}/${score.total} correct`}
+        tone="green"
+      />
+      <StatusMetric
+        icon={<Layers3 size={18} />}
+        label="현재 모듈"
+        value={currentModule.shortTitle}
+        detail={`${activeModuleScore.completed}/${activeModuleScore.total} completed · ${activeModulePercent}%`}
+        tone="teal"
+      />
+      <StatusMetric
+        icon={mode === "focus" ? <Shuffle size={18} /> : <BookOpen size={18} />}
+        label="학습 모드"
+        value={mode === "focus" ? "Focus" : "Learn"}
+        detail={mode === "focus" ? "랜덤 실전 점검" : "개념과 문제 병행"}
+        tone="slate"
+      />
+    </section>
+  );
+}
+
+function StatusMetric({ icon, label, value, detail, tone }) {
+  return (
+    <div className={`status-metric ${tone}`}>
+      <span className="metric-icon">{icon}</span>
+      <span className="metric-copy">
+        <span>{label}</span>
+        <strong>{value}</strong>
+        <small>{detail}</small>
+      </span>
+    </div>
+  );
+}
+
+function ModuleOverview({ modules, activeModuleId, getModuleScore, onSelect }) {
+  return (
+    <section className="module-overview" aria-label="Module progress overview">
+      {modules.map((module, index) => {
+        const moduleScore = getModuleScore(module);
+        const percent = moduleScore.total ? Math.round((moduleScore.completed / moduleScore.total) * 100) : 0;
+        const status = moduleScore.completed === moduleScore.total ? "done" : module.id === activeModuleId ? "current" : "ready";
+        return (
+          <button className={`module-node ${status}`} key={module.id} type="button" title={module.title} onClick={() => onSelect(index)}>
+            <span className="node-index">{index + 1}</span>
+            <span className="node-copy">
+              <strong>{module.shortTitle}</strong>
+              <small>{moduleScore.correct}/{moduleScore.total} correct</small>
+            </span>
+            <span className="node-bar" aria-hidden="true">
+              <span style={{ width: `${percent}%` }} />
+            </span>
+          </button>
+        );
+      })}
+    </section>
   );
 }
 
@@ -524,7 +628,7 @@ function ConceptPanel({ module }) {
     <article className="study-panel panel-enter">
       <div className="panel-heading">
         <p className="eyebrow">Concept Brief</p>
-        <h3>{module.title}</h3>
+        <h3><BookOpen size={20} /> {module.title}</h3>
       </div>
       <div className="callout">{module.summary}</div>
       <ul className="concept-list">
@@ -533,7 +637,7 @@ function ConceptPanel({ module }) {
         ))}
       </ul>
       <div className="command-bank">
-        <p className="eyebrow">Command Bank</p>
+        <p className="eyebrow"><Command size={14} /> Command Bank</p>
         {module.commands.map((command) => (
           <code className="command-chip" key={command}>{command}</code>
         ))}
@@ -558,13 +662,14 @@ function PracticePanel({
   trackLabel,
 }) {
   const feedback = getFeedback(mode, question, answer);
+  const checked = Boolean(answer?.checked);
 
   return (
     <article className="quiz-panel practice-panel panel-enter">
       <div className="panel-heading inline-heading">
         <div>
           <p className="eyebrow">Practice</p>
-          <h3>문제 풀이</h3>
+          <h3><Target size={20} /> 문제 풀이</h3>
         </div>
         <div className="question-count">
           {currentNumber} / {totalNumber}
@@ -578,17 +683,25 @@ function PracticePanel({
 
       {question.type === "choice" ? (
         <div className="choice-list">
-          {question.options.map((option, index) => (
-            <button
-              className={`choice-button ${answer?.value === index ? "selected" : ""}`}
-              key={option}
-              type="button"
-              onClick={() => onChoice(index)}
-            >
-              {option}
-              {answer?.value === index && <CheckCircle2 size={18} />}
-            </button>
-          ))}
+          {question.options.map((option, index) => {
+            const selected = answer?.value === index;
+            const isCorrect = checked && index === question.answer;
+            const isWrong = checked && selected && index !== question.answer;
+            return (
+              <button
+                className={`choice-button ${selected ? "selected" : ""} ${isCorrect ? "correct" : ""} ${isWrong ? "wrong" : ""}`}
+                key={option}
+                type="button"
+                onClick={() => onChoice(index)}
+              >
+                <span className="choice-index">{String.fromCharCode(65 + index)}</span>
+                <span className="choice-copy">{option}</span>
+                {isCorrect && <CheckCircle2 size={18} />}
+                {isWrong && <XCircle size={18} />}
+                {!checked && selected && <CheckCircle2 size={18} />}
+              </button>
+            );
+          })}
         </div>
       ) : (
         <div className="terminal-box">
@@ -655,7 +768,7 @@ function ResultPanel({ mode, scorePercent, score, progressPercent, modules, getM
     <section className="result-panel panel-enter">
       <div className="panel-heading">
         <p className="eyebrow">Result Report</p>
-        <h3>학습 결과</h3>
+        <h3><BarChart3 size={20} /> 학습 결과</h3>
       </div>
 
       <div className="result-summary">
@@ -694,7 +807,7 @@ function ResultPanel({ mode, scorePercent, score, progressPercent, modules, getM
         <div className="answer-review">
           <h4>오답 리뷰</h4>
           {!incorrect.length ? (
-            <p>오답이 없습니다. 지금 흐름이면 L100 기본 개념은 안정적입니다.</p>
+            <p>오답이 없습니다. 지금 흐름이면 현재 레벨의 핵심 개념은 안정적입니다.</p>
           ) : (
             incorrect.map(({ module, question, index, key }) => {
               const answer = answers[key] ?? answers[questionKey(module.id, index)];
