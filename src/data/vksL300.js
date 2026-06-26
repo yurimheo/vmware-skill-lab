@@ -16,7 +16,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "VKS 멀티테넌시에서 Namespace 설계 시 함께 고려해야 하는 묶음으로 가장 적절한 것은 무엇인가요?",
-          options: ["권한, 리소스, 스토리지, 네트워크", "브라우저, 폰트, 북마크, 테마", "Pod 이름, 줄바꿈, 탭 크기, 색상", "로그인 배경, 아이콘, 즐겨찾기, 알림음"],
+          options: ["권한, 리소스, 스토리지, 네트워크", "Ingress, TLS, DNS, WAF", "Image Registry, Scan Policy, Robot Account, Retention", "TKR, VM Class, NodePool, MachineDeployment"],
           answer: 0,
           explanation: "Namespace는 권한, 리소스 제한, Storage Policy, NetworkPolicy가 결합되는 운영 경계입니다.",
         },
@@ -40,14 +40,14 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "TKR 업그레이드 전 확인해야 할 항목으로 가장 적절한 것은 무엇인가요?",
-          options: ["Add-on 호환성과 백업 계획", "터미널 색상", "Pod 이름의 예쁜 정도", "README 줄 수"],
+          options: ["Add-on 호환성과 백업 계획", "IngressClass와 TLS Secret만", "Namespace ResourceQuota만", "Harbor Project quota만"],
           answer: 0,
           explanation: "업그레이드는 Kubernetes 버전뿐 아니라 CNI, CSI, Ingress, 백업 도구 호환성을 함께 확인해야 합니다.",
         },
         {
           type: "choice",
           prompt: "TKC 업그레이드가 중간에 멈추고 일부 노드만 새 버전으로 교체된 상황에서 우선 확인할 대상은 무엇인가요?",
-          options: ["TKC Conditions, Machine 상태, Node Ready, 관련 Events", "브라우저 캐시와 README", "Ingress host와 DNS TTL만", "Grafana 패널 색상"],
+          options: ["TKC Conditions, Machine 상태, Node Ready, 관련 Events", "Ingress host와 DNS TTL만", "PVC 사용량과 Snapshot 수만", "Harbor Project quota만"],
           answer: 0,
           explanation: "부분 업그레이드 정체는 TKC 조건, Machine/Node 상태, 이벤트를 연결해 어느 단계에서 멈췄는지 확인해야 합니다.",
         },
@@ -78,7 +78,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "RWX 볼륨 요구사항이 있는 애플리케이션을 설계할 때 먼저 확인해야 할 것은 무엇인가요?",
-          options: ["지원되는 파일 서비스 또는 스토리지 구성이 있는지", "Pod 이름이 짧은지", "Ingress host가 한 글자인지", "ConfigMap이 비어 있는지"],
+          options: ["지원되는 파일 서비스 또는 스토리지 구성이 있는지", "Ingress Controller가 Host 기반 라우팅을 지원하는지", "Harbor Project가 이미지 서명을 요구하는지", "NetworkPolicy가 egress를 허용하는지"],
           answer: 0,
           explanation: "RWX는 여러 노드에서 동시에 접근하는 요구사항이므로 지원 스토리지와 File Service 구성을 확인해야 합니다.",
         },
@@ -109,14 +109,14 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "NSX 기반 네트워크 선택 시 강점으로 가장 적절한 것은 무엇인가요?",
-          options: ["네트워크 가상화와 보안 정책 연계", "YAML 들여쓰기 자동 수정", "브라우저 캐시 삭제", "로컬 파일 압축"],
+          options: ["네트워크 가상화와 보안 정책 연계", "Storage Policy 기반 볼륨 프로비저닝", "이미지 취약점 스캔과 서명 검증", "GitOps 기반 Manifest 동기화"],
           answer: 0,
           explanation: "NSX 기반 구성은 네트워크 가상화와 보안 정책 연계에 강점이 있습니다.",
         },
         {
           type: "choice",
           prompt: "외부 노출 설계에서 애플리케이션 배포 전에 먼저 정리해야 하는 기준은 무엇인가요?",
-          options: ["VIP, DNS, 인증서, 라우팅 정책", "버튼 색상과 카드 그림자", "문제 보기 순서", "로컬 다운로드 폴더"],
+          options: ["VIP, DNS, 인증서, 라우팅 정책", "StorageClass, PVC, CNS, Snapshot 정책", "TKR, VM Class, NodePool, PDB", "Harbor Project, Robot Account, Retention Policy"],
           answer: 0,
           explanation: "외부 접근 경로는 VIP/DNS/인증서/라우팅 기준이 먼저 정리되어야 장애 분석도 쉬워집니다.",
         },
@@ -133,7 +133,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "Add-on 운영에서 설치만큼 중요한 기준은 무엇인가요?",
-          options: ["버전 호환성과 롤백 절차", "버튼 색상", "스크린샷 크기", "파일명 길이"],
+          options: ["버전 호환성과 롤백 절차", "Namespace 이름 규칙", "Service selector 표준", "PVC accessMode 정책"],
           answer: 0,
           explanation: "Add-on은 업그레이드와 장애 영향이 크므로 호환성과 롤백 기준이 중요합니다.",
         },
@@ -181,7 +181,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "OIDC 연동 후에도 실제 리소스 접근 제어를 위해 필요한 것은 무엇인가요?",
-          options: ["Kubernetes RBAC", "브라우저 즐겨찾기", "Pod 재시작 횟수", "CSS 변수"],
+          options: ["Kubernetes RBAC", "StorageClass BindingMode", "IngressClass Parameters", "Harbor Retention Policy"],
           answer: 0,
           explanation: "OIDC는 인증 수단이고, 권한은 RBAC로 제어합니다.",
         },
@@ -253,7 +253,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "GitOps에서 운영 상태의 기준으로 삼는 것은 무엇인가요?",
-          options: ["Git 저장소", "개인 메모장", "브라우저 탭", "터미널 배경색"],
+          options: ["Git 저장소", "vCenter Recent Tasks", "Kubernetes Events", "Harbor Project 설정"],
           answer: 0,
           explanation: "GitOps는 Git 저장소의 선언 상태를 기준으로 실제 클러스터 상태를 맞춥니다.",
         },
@@ -277,7 +277,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "운영 환경에서 자동 Sync 대신 수동 Sync를 선택할 수 있는 이유는 무엇인가요?",
-          options: ["승인 기반 변경 통제를 위해", "문제 수를 줄이기 위해", "CSS를 줄이기 위해", "파일 탐색기를 닫기 위해"],
+          options: ["승인 기반 변경 통제를 위해", "클러스터 자동 확장을 강제하기 위해", "PVC Snapshot을 자동 삭제하기 위해", "이미지 스캔을 우회하기 위해"],
           answer: 0,
           explanation: "운영 환경은 변경 통제와 승인 절차 때문에 수동 Sync가 더 적합할 수 있습니다.",
         },
@@ -315,7 +315,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "Ingress는 생성됐지만 Avi Virtual Service가 만들어지지 않는 경우 우선 확인할 항목은 무엇인가요?",
-          options: ["IngressClass/annotation, AKO 로그, Avi Controller 동기화 상태", "PVC accessMode만", "Node CPU 사용률만", "README 링크만"],
+          options: ["IngressClass/annotation, AKO 로그, Avi Controller 동기화 상태", "PVC accessMode와 StorageClass만", "Node CPU 사용률과 HPA만", "Harbor Project quota와 Scan Policy만"],
           answer: 0,
           explanation: "Kubernetes Ingress와 Avi 객체 사이의 동기화 문제는 AKO가 어떤 리소스를 감지하고 거부했는지 확인해야 합니다.",
         },
@@ -370,14 +370,14 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "VM 서비스에 L7 접근을 제공할 때 함께 관리해야 하는 항목은 무엇인가요?",
-          options: ["DNS, VIP, 인증서, 라우팅", "폰트, 아이콘, 배경, 여백", "파일명, 탭, 줄 수, 커서", "캐시, 북마크, 확대율, 테마"],
+          options: ["DNS, VIP, 인증서, 라우팅", "StorageClass, CNS, Snapshot, Datastore", "TKR, VM Class, NodePool, Machine", "Harbor, ImagePullSecret, Robot Account, Scan Policy"],
           answer: 0,
           explanation: "L7 접근은 DNS, VIP, 인증서, 라우팅 정책이 함께 맞아야 합니다.",
         },
         {
           type: "choice",
           prompt: "VM 기반 서비스와 컨테이너 앱을 같은 방식으로 운영할 때 특히 구분해야 하는 것은 무엇인가요?",
-          options: ["생명주기와 패치 책임 경계", "버튼 아이콘", "문제 보기 길이", "터미널 탭 이름"],
+          options: ["생명주기와 패치 책임 경계", "Ingress host와 TLS Secret", "PVC accessMode와 SnapshotClass", "NetworkPolicy egress rule"],
           answer: 0,
           explanation: "VM 서비스는 OS 패치, 재부팅, 백업, 애플리케이션 배포 책임이 컨테이너와 다를 수 있습니다.",
         },
@@ -394,7 +394,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "VCF-A All Apps Mode 관점에서 중요한 운영 방향은 무엇인가요?",
-          options: ["VM과 컨테이너 앱의 통합 정책 관리", "로컬 폴더 색상 통일", "문제 순서 고정", "브라우저 확대"],
+          options: ["VM과 컨테이너 앱의 통합 정책 관리", "TKR 버전만 통일", "Ingress host만 표준화", "PVC accessMode만 제한"],
           answer: 0,
           explanation: "All Apps Mode는 VM과 컨테이너 앱을 통합된 정책과 운영 모델로 다루는 방향입니다.",
         },
@@ -425,7 +425,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "GPU 노드 풀을 에어갭 환경에 배포할 때 특히 중요한 준비 항목은 무엇인가요?",
-          options: ["GPU Operator 이미지와 드라이버 반입 절차", "브라우저 확대율", "Ingress host 길이", "README 표 개수"],
+          options: ["GPU Operator 이미지와 드라이버 반입 절차", "Ingress Controller replica 수", "External DNS provider 권한", "Harbor Project retention 기간"],
           answer: 0,
           explanation: "에어갭 환경은 외부 레지스트리 접근이 제한되므로 이미지, 드라이버, Helm chart 반입 절차가 중요합니다.",
         },
@@ -442,21 +442,21 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "백업 체계에서 가장 중요한 검증 활동은 무엇인가요?",
-          options: ["복구 테스트", "버튼 색상 변경", "README 삭제", "문제 순서 고정"],
+          options: ["복구 테스트", "백업 Job 성공 로그만 확인", "SnapshotClass 이름만 표준화", "백업 저장소 용량만 확인"],
           answer: 0,
           explanation: "백업은 실제 복구가 가능한지 정기적으로 검증해야 의미가 있습니다.",
         },
         {
           type: "choice",
           prompt: "Velero 백업은 성공했지만 복구 후 애플리케이션이 정상 기동하지 않을 때 우선 의심할 항목은 무엇인가요?",
-          options: ["PVC 복구 상태, Secret/ConfigMap 누락, 애플리케이션 정합성", "브라우저 확대율", "문제 보기 순서", "터미널 테마"],
+          options: ["PVC 복구 상태, Secret/ConfigMap 누락, 애플리케이션 정합성", "Ingress host와 DNS TTL만", "Node label과 taint만", "Harbor Project quota만"],
           answer: 0,
           explanation: "복구 실패는 백업 Job 성공 여부뿐 아니라 영속 볼륨, 설정/비밀 정보, 애플리케이션 데이터 정합성을 확인해야 합니다.",
         },
         {
           type: "choice",
           prompt: "Stateful 애플리케이션 백업 시 단순 리소스 백업 외에 고려해야 할 것은 무엇인가요?",
-          options: ["애플리케이션 데이터 정합성", "Pod 이름의 길이", "Service selector 정렬", "터미널 색상"],
+          options: ["애플리케이션 데이터 정합성", "Service selector 정렬", "IngressClass 이름 표준화", "Node label 개수"],
           answer: 0,
           explanation: "DB 같은 Stateful 앱은 백업 시점의 쓰기 정합성과 복구 순서를 고려해야 합니다.",
         },
@@ -473,21 +473,21 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "VKS 관측성에서 Kubernetes 메트릭만 보면 놓칠 수 있는 계층은 무엇인가요?",
-          options: ["vSphere 인프라 계층", "Markdown 제목", "브라우저 탭", "문제 보기 순서"],
+          options: ["vSphere 인프라 계층", "Harbor Project 계층", "GitOps Repository 계층", "DNS Provider 계층"],
           answer: 0,
           explanation: "VKS는 VM, 스토리지, 네트워크와 연결되므로 vSphere 인프라 지표도 함께 봐야 합니다.",
         },
         {
           type: "choice",
           prompt: "VKS 장애 분석용 대시보드에서 함께 연결해서 봐야 하는 흐름은 무엇인가요?",
-          options: ["Pod, Node, CNI/CSI, Load Balancer, vSphere 지표", "폰트, 색상, 카드, 버튼", "README, 커밋, 브랜치, 태그", "브라우저, 북마크, 캐시, 탭"],
+          options: ["Pod, Node, CNI/CSI, Load Balancer, vSphere 지표", "Harbor, ImagePullSecret, Scan Policy, Retention", "Git commit, Branch, Argo App, Project", "DNS Zone, TTL, Record, Provider Credential"],
           answer: 0,
           explanation: "VKS 장애는 Kubernetes와 vSphere 계층을 넘나들기 때문에 지표도 계층별로 이어져야 합니다.",
         },
         {
           type: "choice",
           prompt: "사용자는 느리다고 하지만 Pod CPU/Memory는 정상일 때 VKS 관점에서 추가로 확인할 지표는 무엇인가요?",
-          options: ["노드 VM 리소스, 스토리지 지연, Load Balancer, 네트워크 패킷/드롭", "문제 카드 높이", "README 줄 수", "브라우저 테마"],
+          options: ["노드 VM 리소스, 스토리지 지연, Load Balancer, 네트워크 패킷/드롭", "Ingress host와 TLS Secret만", "Harbor scan queue만", "GitOps sync status만"],
           answer: 0,
           explanation: "성능 장애는 Pod 메트릭만으로 끝나지 않고 vSphere VM, 스토리지, 네트워크, LB 경로까지 함께 확인해야 합니다.",
         },
@@ -504,7 +504,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "운영 Grafana 대시보드에서 가장 중요한 기준은 무엇인가요?",
-          options: ["장애 판단에 필요한 지표와 Drill-down 경로", "패널 수를 무조건 늘리기", "한 색상만 사용하기", "차트 제목 숨기기"],
+          options: ["장애 판단에 필요한 지표와 Drill-down 경로", "클러스터 평균값만 보여주는 단일 패널", "비즈니스 KPI만 보여주는 요약 패널", "개별 Pod 로그만 링크하는 패널"],
           answer: 0,
           explanation: "운영 대시보드는 문제를 빠르게 좁힐 수 있는 지표와 이동 경로가 중요합니다.",
         },
@@ -552,7 +552,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "Three Zone 설계의 핵심 목적은 무엇인가요?",
-          options: ["장애 도메인 분리", "문제 순서 고정", "UI 색상 통일", "파일 압축"],
+          options: ["장애 도메인 분리", "StorageClass 기본값 통일", "IngressClass 단일화", "Harbor Project 통합"],
           answer: 0,
           explanation: "Three Zone은 단일 Zone 장애 영향을 줄이기 위해 장애 도메인을 분리합니다.",
         },
@@ -576,7 +576,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "vSAN 확장 클러스터 기반 VKS에서 반드시 함께 검토해야 하는 것은 무엇인가요?",
-          options: ["사이트 장애 시 Pod와 Volume 접근성", "브라우저 캐시", "README 문장 수", "문제 보기 길이"],
+          options: ["사이트 장애 시 Pod와 Volume 접근성", "Ingress host와 TLS 인증서만", "Harbor Retention Policy만", "External DNS TTL만"],
           answer: 0,
           explanation: "확장 클러스터는 사이트 장애 상황에서 워크로드와 스토리지 접근성이 유지되는지 검증해야 합니다.",
         },
@@ -600,7 +600,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "VKS 멀티테넌시 완성에 필요한 조합으로 가장 적절한 것은 무엇인가요?",
-          options: ["RBAC, ResourceQuota, NetworkPolicy, 이미지 격리", "폰트, 색상, 아이콘, 여백", "북마크, 캐시, 확대율, 탭", "zip, png, jpg, pdf"],
+          options: ["RBAC, ResourceQuota, NetworkPolicy, 이미지 격리", "IngressClass, TLS, DNS, WAF 정책", "TKR, VM Class, NodePool, Machine 정책", "PVC, StorageClass, Snapshot, Backup 정책"],
           answer: 0,
           explanation: "멀티테넌시는 권한, 리소스, 네트워크, 이미지 격리가 함께 설계되어야 합니다.",
         },
@@ -631,7 +631,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "Supervisor 활성화 실패 분석을 계층별로 나눠야 하는 이유는 무엇인가요?",
-          options: ["vCenter, ESXi, 네트워크, LB, DNS/NTP, 스토리지 원인이 서로 다를 수 있어서", "문제 수를 늘리기 위해", "Pod 이름을 바꾸기 위해", "README를 줄이기 위해"],
+          options: ["vCenter, ESXi, 네트워크, LB, DNS/NTP, 스토리지 원인이 서로 다를 수 있어서", "Ingress Controller와 AKO만 원인이 될 수 있어서", "Harbor 인증과 이미지 스캔만 원인이 될 수 있어서", "GitOps 동기화만 원인이 될 수 있어서"],
           answer: 0,
           explanation: "활성화 실패는 단일 Kubernetes 문제가 아니라 vSphere 인프라 전반의 준비 상태와 연결됩니다.",
         },
@@ -645,7 +645,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "Supervisor 활성화 작업이 vCenter Task에서 실패할 때 처음 수집할 증거로 가장 적절한 것은 무엇인가요?",
-          options: ["vCenter Recent Tasks/Events와 Workload Management 오류 메시지", "브라우저 스크린샷만", "README 파일", "Pod 로그만"],
+          options: ["vCenter Recent Tasks/Events와 Workload Management 오류 메시지", "TKC Worker Pod 로그만", "Harbor Scan Report만", "External DNS 로그만"],
           answer: 0,
           explanation: "Supervisor 활성화 실패는 vCenter 작업 단계와 오류 메시지를 기준으로 네트워크, LB, 스토리지, 호스트 조건을 좁혀갑니다.",
         },
@@ -676,7 +676,7 @@ export const vksL300 = {
         {
           type: "choice",
           prompt: "Node NotReady와 함께 kubelet 관련 이벤트가 반복될 때 vSphere 관점에서 함께 확인해야 할 것은 무엇인가요?",
-          options: ["노드 VM 전원, 리소스 압박, 시간 동기화, 네트워크 연결", "Ingress host 길이", "PVC 이름", "Grafana 색상"],
+          options: ["노드 VM 전원, 리소스 압박, 시간 동기화, 네트워크 연결", "IngressClass와 TLS Secret", "PVC accessMode와 SnapshotClass", "Harbor Project quota"],
           answer: 0,
           explanation: "VKS Node는 vSphere VM이므로 kubelet 문제도 VM 전원/리소스/네트워크/시간 동기화와 함께 봐야 합니다.",
         },

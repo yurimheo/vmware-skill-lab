@@ -31,14 +31,14 @@ export const vksL200 = {
         {
           type: "choice",
           prompt: "Supervisor 활성화 전 사전 점검 항목으로 가장 적절한 조합은 무엇인가요?",
-          options: ["라이선스, 네트워크, Load Balancer, Storage Policy", "브라우저 테마, 폰트, 탭 위치, 즐겨찾기", "Pod 이름, Secret 이름, ConfigMap 줄 수, 이미지 태그 길이", "README 제목, 파일명, 커밋 메시지, 터미널 크기"],
+          options: ["라이선스, 네트워크, Load Balancer, Storage Policy", "TKR, Pod Security, IngressClass, ConfigMap", "Harbor Project, Robot Account, ImagePullSecret, Scan Policy", "ResourceQuota, LimitRange, NetworkPolicy, RoleBinding"],
           answer: 0,
           explanation: "Workload Management 활성화는 vSphere 라이선스와 네트워크/LB/스토리지 준비 상태의 영향을 받습니다.",
         },
         {
           type: "choice",
           prompt: "실무에서 Workload Management 활성화 직전 마지막으로 점검할 순서로 가장 적절한 것은 무엇인가요?",
-          options: ["클러스터 호환성 → 관리/워크로드 네트워크 → LB/VIP → Storage Policy", "Pod 로그 → Ingress host → README → 브라우저 캐시", "컨테이너 이미지 → Service selector → PVC 이름 → 터미널 색상", "Git 브랜치 → Markdown 제목 → 아이콘 → 줄바꿈"],
+          options: ["클러스터 호환성 → 관리/워크로드 네트워크 → LB/VIP → Storage Policy", "TKR 선택 → 앱 Ingress → External DNS → Harbor Project", "Namespace 권한 → Pod 로그 → Service Endpoint → PVC 확장", "Worker replicas → HPA → Prometheus Rule → Grafana Dashboard"],
           answer: 0,
           explanation: "Supervisor 활성화는 vSphere 클러스터 준비 상태, 네트워크, Load Balancer/VIP, Storage Policy가 맞아야 성공합니다.",
         },
@@ -70,9 +70,9 @@ export const vksL200 = {
         {
           type: "choice",
           prompt: "vSphere Namespace에 연결되는 정책으로 가장 적절하지 않은 것은 무엇인가요?",
-          options: ["브라우저 북마크", "Storage Policy", "CPU/Memory 제한", "사용자/그룹 권한"],
+          options: ["IngressClass", "Storage Policy", "CPU/Memory 제한", "사용자/그룹 권한"],
           answer: 0,
-          explanation: "브라우저 북마크는 Namespace 운영 정책과 관련이 없습니다.",
+          explanation: "IngressClass는 애플리케이션 L7 라우팅과 관련이 있고, vSphere Namespace의 기본 운영 정책으로 직접 연결되는 항목은 아닙니다.",
         },
         {
           type: "choice",
@@ -84,7 +84,7 @@ export const vksL200 = {
         {
           type: "choice",
           prompt: "개발팀에 TKC 배포 권한을 주기 전 Namespace에서 반드시 연결해야 할 운영 기준은 무엇인가요?",
-          options: ["권한, 리소스 제한, VM Class, Storage Policy", "브라우저 북마크, 폰트, 확대율, 테마", "Pod 로그 색상, README, 파일명, 탭 크기", "Ingress path, CSS 변수, 아이콘, 스크린샷"],
+          options: ["권한, 리소스 제한, VM Class, Storage Policy", "Ingress host, TLS Secret, Service selector, Endpoint", "Harbor Project, ImagePullSecret, Vulnerability Policy, Robot Account", "NetworkPolicy, PodSecurity, LimitRange, ServiceAccount"],
           answer: 0,
           explanation: "Namespace는 사용자가 배포할 수 있는 리소스 범위, VM Class, 스토리지 정책, 권한의 운영 경계입니다.",
         },
@@ -130,7 +130,7 @@ export const vksL200 = {
         {
           type: "choice",
           prompt: "TKC 배포 YAML 작성 시 실무자가 반드시 맞춰야 하는 값으로 가장 적절한 것은 무엇인가요?",
-          options: ["namespace, TKR, VM Class, StorageClass, nodePool replicas", "Pod label 색상, README 길이, 브라우저 캐시, 터미널 폰트", "Ingress path만, Service name만, ConfigMap key만, 주석만", "GitHub 스타 수, 파일 확장자, 스크린샷 크기, 줄 수"],
+          options: ["namespace, TKR, VM Class, StorageClass, nodePool replicas", "IngressClass, Service type, TLS Secret, External DNS annotation", "Harbor Project, ImagePullSecret, Robot Account, Scan Policy", "ResourceQuota, NetworkPolicy, RoleBinding, LimitRange"],
           answer: 0,
           explanation: "TKC 생성에는 배포 Namespace, Kubernetes 릴리즈, VM Class, StorageClass, Control Plane/Worker 규모가 핵심 입력입니다.",
         },
@@ -222,14 +222,14 @@ export const vksL200 = {
         {
           type: "choice",
           prompt: "PVC가 Pending 상태일 때 우선 확인할 항목으로 가장 적절한 것은 무엇인가요?",
-          options: ["StorageClass와 PVC Events", "Ingress host만", "Pod 로그 색상", "컨테이너 이미지 이름 길이"],
+          options: ["StorageClass와 PVC Events", "Ingress host와 TLS Secret", "Pod imagePullPolicy와 Registry", "Service selector와 Endpoint"],
           answer: 0,
           explanation: "PVC Pending은 StorageClass 존재 여부, 접근 모드, CSI 이벤트, 데이터스토어 정책을 함께 확인합니다.",
         },
         {
           type: "choice",
           prompt: "Stateful 앱 배포 전에 StorageClass를 고를 때 실무적으로 먼저 맞춰야 하는 기준은 무엇인가요?",
-          options: ["애플리케이션 I/O 특성과 vSphere Storage Policy", "Pod 이름의 예쁜 정도", "Ingress host 길이", "터미널 테마"],
+          options: ["애플리케이션 I/O 특성과 vSphere Storage Policy", "Ingress Controller와 TLS 인증서 정책", "Harbor Project와 이미지 스캔 정책", "Service type과 EndpointSlice 정책"],
           answer: 0,
           explanation: "StorageClass는 vSphere Storage Policy와 연결되므로 성능, 가용성, 데이터 보호 요구사항과 맞춰야 합니다.",
         },
@@ -275,7 +275,7 @@ export const vksL200 = {
         {
           type: "choice",
           prompt: "애플리케이션 외부 노출 검증 순서로 가장 적절한 것은 무엇인가요?",
-          options: ["DNS → VIP → Ingress/Service → Endpoint → Pod", "README → CSS → 아이콘 → 브라우저 캐시 → 탭", "PVC → TKR → Git commit → 터미널 테마 → 폰트", "Namespace 이름 → 파일명 → 줄 수 → 스크린샷 → 주석"],
+          options: ["DNS → VIP → Ingress/Service → Endpoint → Pod", "PVC → StorageClass → CNS Volume → Datastore → Pod", "TKR → MachineDeployment → Node Ready → CNI → Pod", "Harbor → ImagePullSecret → Deployment → ReplicaSet → Pod"],
           answer: 0,
           explanation: "외부 접속 장애는 사용자 진입점에서 내부 Pod까지 DNS, VIP, 라우팅, Service, Endpoint 순서로 좁혀갑니다.",
         },
@@ -307,21 +307,21 @@ export const vksL200 = {
         {
           type: "choice",
           prompt: "TKC 업그레이드 전 반드시 확인해야 하는 항목으로 가장 적절한 것은 무엇인가요?",
-          options: ["지원되는 TKR 경로", "브라우저 확대 비율", "Pod 이름 길이", "터미널 테마"],
+          options: ["지원되는 TKR 경로", "현재 Ingress Controller 버전", "Namespace ResourceQuota", "Harbor 이미지 보존 정책"],
           answer: 0,
           explanation: "지원되지 않는 버전 경로로 업그레이드하면 클러스터 상태가 불안정해질 수 있습니다.",
         },
         {
           type: "choice",
           prompt: "TKR 업그레이드 중 운영자가 계속 관찰해야 하는 상태로 가장 적절한 것은 무엇인가요?",
-          options: ["TKC 상태와 Node Ready 상태", "README 줄 수", "터미널 폰트", "브라우저 다운로드 위치"],
+          options: ["TKC 상태와 Node Ready 상태", "Ingress host와 DNS TTL", "PVC 사용량과 Snapshot 수", "Harbor Project quota"],
           answer: 0,
           explanation: "업그레이드 중에는 TKC 조건, Control Plane/Worker 교체, Node Ready 상태를 함께 봐야 합니다.",
         },
         {
           type: "choice",
           prompt: "운영 TKC 업그레이드 전에 변경 승인 문서에 반드시 들어가야 할 내용으로 가장 적절한 것은 무엇인가요?",
-          options: ["지원 경로, 영향 범위, 백업/롤백, 관측 항목", "아이콘 색상, 카드 반경, README 줄 수, 터미널 테마", "Pod 이름 길이, 브라우저 캐시, 스크린샷 크기, 탭 위치", "ConfigMap 정렬, 파일명, 폰트, 북마크"],
+          options: ["지원 경로, 영향 범위, 백업/롤백, 관측 항목", "Ingress 정책, TLS Secret, DNS TTL, WAF Rule", "Harbor scan policy, Robot Account, Project quota, Retention", "ResourceQuota, LimitRange, NetworkPolicy, PodSecurity"],
           answer: 0,
           explanation: "업그레이드는 지원 경로와 영향 범위, 백업/롤백 기준, 진행 중 모니터링 항목이 준비되어야 합니다.",
         },
@@ -360,7 +360,7 @@ export const vksL200 = {
         {
           type: "choice",
           prompt: "스케일 인 전에 확인해야 하는 항목으로 가장 적절한 것은 무엇인가요?",
-          options: ["PDB와 중요 Pod 배치 상태", "CSS 변수명", "Pod 이름의 길이", "터미널 배경색"],
+          options: ["PDB와 중요 Pod 배치 상태", "IngressClass와 TLS Secret", "StorageClass allowVolumeExpansion", "Harbor Project quota"],
           answer: 0,
           explanation: "노드 축소는 Pod Eviction을 유발하므로 PDB와 중요 워크로드 배치 상태를 먼저 확인합니다.",
         },

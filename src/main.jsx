@@ -54,6 +54,21 @@ function shuffle(items) {
   return next;
 }
 
+function hashSeed(value) {
+  return [...value].reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) >>> 0, 2166136261);
+}
+
+function seededShuffle(items, seedValue) {
+  const next = [...items];
+  let seed = hashSeed(seedValue);
+  for (let index = next.length - 1; index > 0; index -= 1) {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    const target = seed % (index + 1);
+    [next[index], next[target]] = [next[target], next[index]];
+  }
+  return next;
+}
+
 function normalizeCommand(value, { canonicalResources = true } = {}) {
   const tokens = value.trim().replace(/\s+/g, " ").split(" ").filter(Boolean);
   if (!tokens.length) return "";
@@ -499,6 +514,7 @@ function App() {
             onNext={next}
             isLast={isLastFocusQuestion}
             trackLabel={selectedTrack.label}
+            shuffleSeed={`${currentKey}:${cardTick}`}
           />
         </section>
 
@@ -795,9 +811,20 @@ function PracticePanel({
   onNext,
   isLast,
   trackLabel,
+  shuffleSeed,
 }) {
   const feedback = getFeedback(mode, question, answer);
   const checked = Boolean(answer?.checked);
+  const displayOptions = useMemo(
+    () =>
+      question.type === "choice"
+        ? seededShuffle(
+            question.options.map((option, originalIndex) => ({ option, originalIndex })),
+            shuffleSeed,
+          )
+        : [],
+    [question, shuffleSeed],
+  );
 
   return (
     <article className="quiz-panel practice-panel panel-enter">
@@ -821,18 +848,18 @@ function PracticePanel({
 
       {question.type === "choice" ? (
         <div className="choice-list">
-          {question.options.map((option, index) => {
-            const selected = answer?.value === index;
-            const isCorrect = checked && index === question.answer;
-            const isWrong = checked && selected && index !== question.answer;
+          {displayOptions.map(({ option, originalIndex }, displayIndex) => {
+            const selected = answer?.value === originalIndex;
+            const isCorrect = checked && originalIndex === question.answer;
+            const isWrong = checked && selected && originalIndex !== question.answer;
             return (
               <button
                 className={`choice-button ${selected ? "selected" : ""} ${isCorrect ? "correct" : ""} ${isWrong ? "wrong" : ""}`}
                 key={option}
                 type="button"
-                onClick={() => onChoice(index)}
+                onClick={() => onChoice(originalIndex)}
               >
-                <span className="choice-index">{String.fromCharCode(65 + index)}</span>
+                <span className="choice-index">{String.fromCharCode(65 + displayIndex)}</span>
                 <span className="choice-copy">{option}</span>
                 {isCorrect && <CheckCircle2 size={18} />}
                 {isWrong && <XCircle size={18} />}

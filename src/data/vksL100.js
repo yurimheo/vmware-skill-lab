@@ -142,7 +142,7 @@ export const vksL100 = {
         {
           type: "choice",
           prompt: "vSphere Namespace에 연결되는 항목으로 가장 적절한 것은 무엇인가요?",
-          options: ["Storage Policy와 사용자 권한", "브라우저 캐시", "Pod 내부 /tmp 용량", "터미널 프로필"],
+          options: ["Storage Policy와 사용자 권한", "IngressClass와 TLS Secret", "Pod 내부 /tmp 용량", "Container image tag"],
           answer: 0,
           explanation: "vSphere Namespace에는 사용자/그룹 권한, 리소스 제한, Storage Policy 등이 연결됩니다.",
         },
@@ -236,7 +236,7 @@ export const vksL100 = {
         {
           type: "choice",
           prompt: "Pod 간 통신은 안 되지만 Pod 자체는 Running일 때 우선 확인할 가능성이 높은 영역은 무엇인가요?",
-          options: ["CNI와 NetworkPolicy", "StorageClass만", "TKR 목록만", "로컬 브라우저 설정"],
+          options: ["CNI와 NetworkPolicy", "StorageClass와 PVC", "TKR 목록과 NodePool", "Ingress와 DNS"],
           answer: 0,
           explanation: "Pod 네트워크 문제는 CNI 상태와 NetworkPolicy 적용 여부를 함께 확인해야 합니다.",
         },
@@ -333,7 +333,7 @@ export const vksL100 = {
         {
           type: "choice",
           prompt: "현재 kubectl이 어느 클러스터/namespace를 바라보는지 확인해야 하는 이유로 가장 적절한 것은 무엇인가요?",
-          options: ["잘못된 Context에서 리소스를 변경하는 사고를 줄이기 위해", "명령어 글자 수를 줄이기 위해", "로그 색상을 바꾸기 위해", "YAML 파일을 압축하기 위해"],
+          options: ["잘못된 Context에서 리소스를 변경하는 사고를 줄이기 위해", "현재 Namespace의 ResourceQuota를 자동으로 늘리기 위해", "Service Endpoint를 자동으로 복구하기 위해", "StorageClass를 자동으로 선택하기 위해"],
           answer: 0,
           explanation: "Supervisor와 TKC Context를 혼동하면 엉뚱한 계층에서 조회하거나 변경할 수 있습니다.",
         },
