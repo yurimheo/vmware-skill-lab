@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Command,
   GraduationCap,
+  Grid3X3,
   Layers3,
   RotateCcw,
   Shuffle,
@@ -22,6 +23,16 @@ import { vksTracks } from "./data/vksTracks";
 import "./styles.css";
 
 const STORAGE_KEY = "vmware-skill-lab:vks-react";
+const SOLUTION_FAMILY = "Cloud Native";
+const SOLUTION_NAME = "vSphere Kubernetes Service";
+const SOLUTION_CODE = "VKS";
+const atlasFamilies = [
+  { name: "Core Infrastructure", tracks: "vSphere · vSAN · VCF", state: "planned" },
+  { name: "Networking & Security", tracks: "NSX · Avi · Firewall", state: "planned" },
+  { name: "Cloud Native", tracks: "VKS · Tanzu · Kubernetes", state: "active" },
+  { name: "Operations", tracks: "Aria · VCF Operations", state: "planned" },
+  { name: "Automation & DR", tracks: "PowerCLI · HCX · SRM", state: "planned" },
+];
 
 function questionKey(moduleId, index) {
   return `${moduleId}:${index}`;
@@ -277,8 +288,8 @@ function App() {
         <button className="brand brand-button" type="button" onClick={() => setShowGate(true)} aria-label="레벨 선택 화면으로 돌아가기">
           <span className="brand-mark">V</span>
           <div>
-            <h1>VMware Skill Lab</h1>
-            <p>{selectedTrack.level}</p>
+            <h1>Skill Atlas</h1>
+            <p>{SOLUTION_FAMILY} / {selectedTrack.label}</p>
           </div>
         </button>
 
@@ -349,7 +360,7 @@ function App() {
       <main className="workspace">
         <header className="topbar">
           <div>
-            <p className="eyebrow">Interactive VMware Learning</p>
+            <p className="breadcrumb">VMware Skill Atlas / {SOLUTION_FAMILY} / {SOLUTION_CODE} / {selectedTrack.label}</p>
             <h2>{selectedTrack.title}</h2>
             <p className="topbar-subtitle">{selectedTrack.description}</p>
           </div>
@@ -375,11 +386,11 @@ function App() {
 
         <section className="hero-panel">
           <div>
-            <p className="eyebrow">Learning Path</p>
-            <h3>{selectedTrack.label} 실무 판단력을 단계별로 점검합니다.</h3>
+            <p className="eyebrow">Track Workspace</p>
+            <h3>{SOLUTION_NAME} 역량 트랙</h3>
             <p>
-              개념 브리프를 먼저 훑고 바로 문제를 풀어보세요. Focus 모드는 전체 문항을 섞어 실전 점검처럼 진행하고,
-              결과 리포트에서 약한 모듈과 오답을 다시 볼 수 있습니다.
+              VMware 전체 스킬 맵 안에서 현재는 Cloud Native 영역의 VKS 트랙을 학습 중입니다.
+              모듈별 지식 확인, 커맨드 연습, Assessment 모드 결과를 한 흐름으로 관리합니다.
             </p>
           </div>
           <div className="hero-actions">
@@ -482,7 +493,7 @@ function DashboardStrip({
         icon={mode === "focus" ? <Shuffle size={18} /> : <BookOpen size={18} />}
         label="학습 모드"
         value={mode === "focus" ? "Focus" : "Learn"}
-        detail={mode === "focus" ? "랜덤 실전 점검" : "개념과 문제 병행"}
+        detail={mode === "focus" ? "Assessment mode" : "Guided study"}
         tone="slate"
         onClick={onToggleMode}
       />
@@ -543,7 +554,7 @@ function LaunchScreen({ saved, selectedIndex, onSelect }) {
         <div className="intro-pulse" aria-hidden="true" />
         <div className="intro-logo" aria-label="VMware Skill Lab">
           <span>V</span>
-          <strong>VMware Skill Lab</strong>
+          <strong>VMware Skill Atlas</strong>
         </div>
       </main>
     );
@@ -551,40 +562,48 @@ function LaunchScreen({ saved, selectedIndex, onSelect }) {
 
   return (
     <main className={`launch-screen ${launchStep === "level" ? "level-step" : "solution-step"}`}>
-      <section className="launch-hero" aria-label="VMware learning selection">
-        <div className="launch-signal" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-
+      <section className="launch-hero" aria-label="VMware skill atlas selection">
         <div className="launch-title">
           <span className="launch-mark">V</span>
           <div>
-            <p className="eyebrow">VMware Skill Lab</p>
-            <h1>{launchStep === "level" ? "학습할 VKS 레벨을 선택하세요." : "학습할 VMware 솔루션을 선택하세요."}</h1>
+            <p className="eyebrow">VMware Skill Atlas</p>
+            <h1>{launchStep === "level" ? "VKS 역량 레벨을 선택하세요." : "VMware 역량 지도를 넓혀갑니다."}</h1>
             <p>
               {launchStep === "level"
-                ? "각 레벨은 개념 학습, 문제 풀이, 커맨드 실습, 결과 리포트로 구성됩니다."
-                : "현재 MVP는 VKS 트랙부터 시작합니다. 이후 vSphere, vSAN, NSX, VCF 트랙으로 확장할 수 있습니다."}
+                ? "Foundation, Implementation, Advanced 레벨을 따라 지식 확인과 실무형 체크를 진행합니다."
+                : "솔루션별 스킬셋을 하나의 학습 지도에 쌓아갑니다. 현재는 Cloud Native 영역의 VKS 트랙이 활성화되어 있습니다."}
             </p>
           </div>
         </div>
 
         {launchStep === "solution" ? (
-          <div className="solution-grid stage-enter">
+          <div className="atlas-layout stage-enter">
+            <div className="atlas-map" aria-label="VMware solution families">
+              {atlasFamilies.map((family) => (
+                <button
+                  className={`atlas-family ${family.state}`}
+                  key={family.name}
+                  type="button"
+                  disabled={family.state !== "active"}
+                  onClick={() => setLaunchStep("level")}
+                >
+                  <span>{family.name}</span>
+                  <strong>{family.tracks}</strong>
+                </button>
+              ))}
+            </div>
             <button className="solution-card selected" type="button" onClick={() => setLaunchStep("level")}>
-              <span className="solution-icon">VKS</span>
-              <span className="profile-name">vSphere Kubernetes Service</span>
+              <span className="solution-icon"><Grid3X3 size={28} /> {SOLUTION_CODE}</span>
+              <span className="profile-name">{SOLUTION_NAME}</span>
               <span className="profile-description">
-                Kubernetes 기반 워크로드 운영을 위한 Foundation, Implementation, Advanced 학습 트랙입니다.
+                Cloud Native 워크로드 운영을 위한 Foundation, Implementation, Advanced 학습 트랙입니다.
               </span>
               <span className="profile-stats">
                 <span>3 levels</span>
                 <span>{vksTracks.reduce((total, track) => total + track.modules.length, 0)} modules</span>
               </span>
               <span className="profile-footer">
-                <span>VKS 트랙 선택</span>
+                <span>활성 트랙 열기</span>
                 <ChevronRight size={18} />
               </span>
             </button>
