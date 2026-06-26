@@ -370,6 +370,7 @@ function App() {
           currentModule={currentModule}
           activeModuleScore={activeModuleScore}
           activeModulePercent={activeModulePercent}
+          onToggleMode={mode === "focus" ? startLearn : startFocus}
         />
 
         <section className="hero-panel">
@@ -443,7 +444,17 @@ function App() {
   );
 }
 
-function DashboardStrip({ mode, progressPercent, scorePercent, progress, score, currentModule, activeModuleScore, activeModulePercent }) {
+function DashboardStrip({
+  mode,
+  progressPercent,
+  scorePercent,
+  progress,
+  score,
+  currentModule,
+  activeModuleScore,
+  activeModulePercent,
+  onToggleMode,
+}) {
   return (
     <section className="dashboard-strip" aria-label="Learning status">
       <StatusMetric
@@ -473,21 +484,23 @@ function DashboardStrip({ mode, progressPercent, scorePercent, progress, score, 
         value={mode === "focus" ? "Focus" : "Learn"}
         detail={mode === "focus" ? "랜덤 실전 점검" : "개념과 문제 병행"}
         tone="slate"
+        onClick={onToggleMode}
       />
     </section>
   );
 }
 
-function StatusMetric({ icon, label, value, detail, tone }) {
+function StatusMetric({ icon, label, value, detail, tone, onClick }) {
+  const Element = onClick ? "button" : "div";
   return (
-    <div className={`status-metric ${tone}`}>
+    <Element className={`status-metric ${tone} ${onClick ? "interactive" : ""}`} type={onClick ? "button" : undefined} onClick={onClick}>
       <span className="metric-icon">{icon}</span>
       <span className="metric-copy">
         <span>{label}</span>
         <strong>{value}</strong>
         <small>{detail}</small>
       </span>
-    </div>
+    </Element>
   );
 }
 
