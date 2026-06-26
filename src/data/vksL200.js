@@ -36,6 +36,13 @@ export const vksL200 = {
           explanation: "Workload Management 활성화는 vSphere 라이선스와 네트워크/LB/스토리지 준비 상태의 영향을 받습니다.",
         },
         {
+          type: "choice",
+          prompt: "실무에서 Workload Management 활성화 직전 마지막으로 점검할 순서로 가장 적절한 것은 무엇인가요?",
+          options: ["클러스터 호환성 → 관리/워크로드 네트워크 → LB/VIP → Storage Policy", "Pod 로그 → Ingress host → README → 브라우저 캐시", "컨테이너 이미지 → Service selector → PVC 이름 → 터미널 색상", "Git 브랜치 → Markdown 제목 → 아이콘 → 줄바꿈"],
+          answer: 0,
+          explanation: "Supervisor 활성화는 vSphere 클러스터 준비 상태, 네트워크, Load Balancer/VIP, Storage Policy가 맞아야 성공합니다.",
+        },
+        {
           type: "command",
           prompt: "Supervisor 접속 후 사용할 수 있는 context 목록을 확인하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+config\\s+get-contexts$"],
@@ -75,6 +82,13 @@ export const vksL200 = {
           explanation: "그룹 기반 권한은 인력 변경 시 운영 부담과 권한 누락 위험을 줄입니다.",
         },
         {
+          type: "choice",
+          prompt: "개발팀에 TKC 배포 권한을 주기 전 Namespace에서 반드시 연결해야 할 운영 기준은 무엇인가요?",
+          options: ["권한, 리소스 제한, VM Class, Storage Policy", "브라우저 북마크, 폰트, 확대율, 테마", "Pod 로그 색상, README, 파일명, 탭 크기", "Ingress path, CSS 변수, 아이콘, 스크린샷"],
+          answer: 0,
+          explanation: "Namespace는 사용자가 배포할 수 있는 리소스 범위, VM Class, 스토리지 정책, 권한의 운영 경계입니다.",
+        },
+        {
           type: "command",
           prompt: "app-ns namespace의 ResourceQuota를 확인하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+get\\s+resourcequota\\s+-n\\s+app-ns$", "^kubectl\\s+-n\\s+app-ns\\s+get\\s+resourcequota$"],
@@ -112,6 +126,20 @@ export const vksL200 = {
           options: ["TKR 참조", "Service selector", "Ingress path", "PVC accessMode"],
           answer: 0,
           explanation: "TKC는 사용 가능한 TKR을 참조해 Kubernetes 릴리즈를 선택합니다.",
+        },
+        {
+          type: "choice",
+          prompt: "TKC 배포 YAML 작성 시 실무자가 반드시 맞춰야 하는 값으로 가장 적절한 것은 무엇인가요?",
+          options: ["namespace, TKR, VM Class, StorageClass, nodePool replicas", "Pod label 색상, README 길이, 브라우저 캐시, 터미널 폰트", "Ingress path만, Service name만, ConfigMap key만, 주석만", "GitHub 스타 수, 파일 확장자, 스크린샷 크기, 줄 수"],
+          answer: 0,
+          explanation: "TKC 생성에는 배포 Namespace, Kubernetes 릴리즈, VM Class, StorageClass, Control Plane/Worker 규모가 핵심 입력입니다.",
+        },
+        {
+          type: "command",
+          prompt: "prod-ns namespace의 app-cluster TKC 생성 실패 원인을 Events와 함께 확인하는 명령어를 입력하세요.",
+          patterns: ["^kubectl\\s+describe\\s+tkc\\s+app-cluster\\s+-n\\s+prod-ns$", "^kubectl\\s+-n\\s+prod-ns\\s+describe\\s+tkc\\s+app-cluster$"],
+          sample: "kubectl describe tkc app-cluster -n prod-ns",
+          explanation: "TKC 생성 실패는 Supervisor Context에서 TKC 리소스의 Conditions와 Events를 먼저 확인합니다.",
         },
         {
           type: "command",
@@ -159,6 +187,13 @@ export const vksL200 = {
           sample: "kubectl apply -f app.yaml",
           explanation: "`apply -f`는 YAML 매니페스트를 선언적으로 적용합니다.",
         },
+        {
+          type: "command",
+          prompt: "web-svc Service가 실제 Pod를 연결하고 있는지 app-ns namespace에서 확인하는 명령어를 입력하세요.",
+          patterns: ["^kubectl\\s+get\\s+endpoints\\s+web-svc\\s+-n\\s+app-ns$", "^kubectl\\s+-n\\s+app-ns\\s+get\\s+endpoints\\s+web-svc$"],
+          sample: "kubectl get endpoints web-svc -n app-ns",
+          explanation: "배포 검증은 Pod Running에서 끝나지 않고 Service Endpoint가 채워졌는지까지 확인해야 합니다.",
+        },
       ],
     },
     {
@@ -190,6 +225,13 @@ export const vksL200 = {
           options: ["StorageClass와 PVC Events", "Ingress host만", "Pod 로그 색상", "컨테이너 이미지 이름 길이"],
           answer: 0,
           explanation: "PVC Pending은 StorageClass 존재 여부, 접근 모드, CSI 이벤트, 데이터스토어 정책을 함께 확인합니다.",
+        },
+        {
+          type: "choice",
+          prompt: "Stateful 앱 배포 전에 StorageClass를 고를 때 실무적으로 먼저 맞춰야 하는 기준은 무엇인가요?",
+          options: ["애플리케이션 I/O 특성과 vSphere Storage Policy", "Pod 이름의 예쁜 정도", "Ingress host 길이", "터미널 테마"],
+          answer: 0,
+          explanation: "StorageClass는 vSphere Storage Policy와 연결되므로 성능, 가용성, 데이터 보호 요구사항과 맞춰야 합니다.",
         },
         {
           type: "command",
@@ -231,6 +273,13 @@ export const vksL200 = {
           explanation: "External IP가 할당되지 않으면 Load Balancer, VIP Pool, AKO/NSX 연동 상태를 확인해야 합니다.",
         },
         {
+          type: "choice",
+          prompt: "애플리케이션 외부 노출 검증 순서로 가장 적절한 것은 무엇인가요?",
+          options: ["DNS → VIP → Ingress/Service → Endpoint → Pod", "README → CSS → 아이콘 → 브라우저 캐시 → 탭", "PVC → TKR → Git commit → 터미널 테마 → 폰트", "Namespace 이름 → 파일명 → 줄 수 → 스크린샷 → 주석"],
+          answer: 0,
+          explanation: "외부 접속 장애는 사용자 진입점에서 내부 Pod까지 DNS, VIP, 라우팅, Service, Endpoint 순서로 좁혀갑니다.",
+        },
+        {
           type: "command",
           prompt: "app-ns namespace의 Ingress 목록을 조회하는 명령어를 입력하세요.",
           patterns: ["^kubectl\\s+get\\s+ingress\\s+-n\\s+app-ns$", "^kubectl\\s+-n\\s+app-ns\\s+get\\s+ingress$"],
@@ -268,6 +317,13 @@ export const vksL200 = {
           options: ["TKC 상태와 Node Ready 상태", "README 줄 수", "터미널 폰트", "브라우저 다운로드 위치"],
           answer: 0,
           explanation: "업그레이드 중에는 TKC 조건, Control Plane/Worker 교체, Node Ready 상태를 함께 봐야 합니다.",
+        },
+        {
+          type: "choice",
+          prompt: "운영 TKC 업그레이드 전에 변경 승인 문서에 반드시 들어가야 할 내용으로 가장 적절한 것은 무엇인가요?",
+          options: ["지원 경로, 영향 범위, 백업/롤백, 관측 항목", "아이콘 색상, 카드 반경, README 줄 수, 터미널 테마", "Pod 이름 길이, 브라우저 캐시, 스크린샷 크기, 탭 위치", "ConfigMap 정렬, 파일명, 폰트, 북마크"],
+          answer: 0,
+          explanation: "업그레이드는 지원 경로와 영향 범위, 백업/롤백 기준, 진행 중 모니터링 항목이 준비되어야 합니다.",
         },
         {
           type: "command",
