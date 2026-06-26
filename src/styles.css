@@ -641,9 +641,8 @@ button:hover {
 }
 
 .score-pill {
-  min-width: 132px;
+  min-width: 118px;
   padding: 12px 14px;
-  border-left: 4px solid var(--teal);
   text-align: right;
 }
 
@@ -687,6 +686,10 @@ button:hover {
 
 .status-metric.interactive {
   cursor: pointer;
+}
+
+.status-metric.interactive:hover {
+  transform: none;
 }
 
 .status-metric.interactive:hover,
