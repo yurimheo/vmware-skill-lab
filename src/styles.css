@@ -94,20 +94,53 @@ button:hover {
 
 .brand-button:hover .brand-mark {
   box-shadow:
-    0 14px 30px rgba(35, 116, 232, 0.34),
-    0 0 0 6px rgba(35, 116, 232, 0.08);
+    0 14px 30px rgba(32, 37, 45, 0.22),
+    0 0 0 6px rgba(37, 115, 107, 0.09);
 }
 
-.brand-mark {
+.logo-mark {
   display: grid;
-  width: 42px;
-  height: 42px;
   place-items: center;
+  overflow: hidden;
   border-radius: 8px;
   background: var(--graphite);
   color: #fff;
-  font-weight: 900;
   box-shadow: 0 10px 24px rgba(32, 37, 45, 0.18);
+}
+
+.logo-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.logo-base {
+  fill: var(--graphite);
+}
+
+.logo-v {
+  fill: #fff;
+}
+
+.logo-route {
+  fill: none;
+  stroke: #9ee0d5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3.8;
+}
+
+.logo-node {
+  fill: #f6f7f2;
+}
+
+.logo-node-accent {
+  fill: #9ee0d5;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
 }
 
 .brand h1,
@@ -334,16 +367,9 @@ button:hover {
   animation: introLogo 1900ms cubic-bezier(0.18, 0.8, 0.2, 1) both;
 }
 
-.intro-logo span {
-  display: grid;
+.intro-mark {
   width: 104px;
   height: 104px;
-  place-items: center;
-  border-radius: 8px;
-  background: var(--graphite);
-  color: #fff;
-  font-size: 54px;
-  font-weight: 900;
   box-shadow:
     0 22px 52px rgba(32, 37, 45, 0.22),
     0 0 0 10px rgba(37, 115, 107, 0.09);
@@ -388,16 +414,9 @@ button:hover {
 }
 
 .launch-mark {
-  display: grid;
   width: 72px;
   height: 72px;
   flex: 0 0 auto;
-  place-items: center;
-  border-radius: 8px;
-  background: var(--graphite);
-  color: #fff;
-  font-size: 34px;
-  font-weight: 900;
   box-shadow: 0 18px 38px rgba(32, 37, 45, 0.2);
 }
 
@@ -1710,10 +1729,9 @@ code {
     text-align: center;
   }
 
-  .intro-logo span {
+  .intro-mark {
     width: 82px;
     height: 82px;
-    font-size: 42px;
   }
 
   .topbar,

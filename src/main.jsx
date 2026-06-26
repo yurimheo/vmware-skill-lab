@@ -136,6 +136,21 @@ function commandCandidates(value) {
   ])].filter(Boolean);
 }
 
+function LogoMark({ className = "" }) {
+  return (
+    <span className={`logo-mark ${className}`} aria-hidden="true">
+      <svg viewBox="0 0 64 64" focusable="false">
+        <path className="logo-base" d="M12 10h40c1.1 0 2 .9 2 2v40c0 1.1-.9 2-2 2H12c-1.1 0-2-.9-2-2V12c0-1.1.9-2 2-2Z" />
+        <path className="logo-v" d="M20 20l9.2 24h5.6L44 20h-6.4l-5.6 16.2L26.4 20H20Z" />
+        <path className="logo-route" d="M17 46h8.5c3.9 0 6.2-2.1 8.5-4.7l3.4-3.9c2-2.3 3.9-3.4 7.2-3.4H47" />
+        <circle className="logo-node" cx="17" cy="46" r="3" />
+        <circle className="logo-node" cx="47" cy="34" r="3" />
+        <circle className="logo-node logo-node-accent" cx="34" cy="41" r="3" />
+      </svg>
+    </span>
+  );
+}
+
 function getCorrectAnswerText(question) {
   if (question.type === "choice") return question.options[question.answer];
   return question.sample;
@@ -366,7 +381,7 @@ function App() {
     <div className={`app-shell ${mode === "focus" ? "focus-mode" : ""}`}>
       <aside className="sidebar">
         <button className="brand brand-button" type="button" onClick={() => setShowGate(true)} aria-label="레벨 선택 화면으로 돌아가기">
-          <span className="brand-mark">V</span>
+          <LogoMark className="brand-mark" />
           <div>
             <h1>Skill Atlas</h1>
             <p>{SOLUTION_FAMILY} / {selectedTrack.label}</p>
@@ -669,7 +684,7 @@ function LaunchScreen({ saved, selectedIndex, onSelect }) {
       <main className="brand-intro" onClick={() => setLaunchStep("solution")}>
         <div className="intro-pulse" aria-hidden="true" />
         <div className="intro-logo" aria-label="VMware Skill Lab">
-          <span>V</span>
+          <LogoMark className="intro-mark" />
           <strong>VMware Skill Atlas</strong>
         </div>
       </main>
@@ -680,7 +695,7 @@ function LaunchScreen({ saved, selectedIndex, onSelect }) {
     <main className={`launch-screen ${launchStep === "level" ? "level-step" : "solution-step"}`}>
       <section className="launch-hero" aria-label="VMware skill atlas selection">
         <div className="launch-title">
-          <span className="launch-mark">V</span>
+          <LogoMark className="launch-mark" />
           <div>
             <p className="eyebrow">VMware Skill Atlas</p>
             <RevealText
