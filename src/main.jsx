@@ -6,6 +6,7 @@ import {
   BookOpen,
   CheckCircle2,
   ChevronRight,
+  CircleHelp,
   ClipboardList,
   Command,
   GraduationCap,
@@ -361,7 +362,7 @@ function App() {
         <header className="topbar">
           <div>
             <p className="breadcrumb">VMware Skill Atlas / {SOLUTION_FAMILY} / {SOLUTION_CODE} / {selectedTrack.label}</p>
-            <h2>{selectedTrack.title}</h2>
+            <RevealText as="h2" text={selectedTrack.title} />
             <p className="topbar-subtitle">{selectedTrack.description}</p>
           </div>
           <div className="score-pill">
@@ -387,7 +388,7 @@ function App() {
         <section className="hero-panel">
           <div>
             <p className="eyebrow">Track Workspace</p>
-            <h3>{SOLUTION_NAME} 역량 트랙</h3>
+            <RevealText as="h3" text={`${SOLUTION_NAME} 역량 트랙`} />
             <p>
               VMware 전체 스킬 맵 안에서 현재는 Cloud Native 영역의 VKS 트랙을 학습 중입니다.
               모듈별 지식 확인, 커맨드 연습, Assessment 모드 결과를 한 흐름으로 관리합니다.
@@ -474,6 +475,7 @@ function DashboardStrip({
         value={`${progressPercent}%`}
         detail={`${progress.completed}/${progress.total} completed`}
         tone="blue"
+        hint="전체 문항 중 답을 확인했거나 건너뛴 항목의 비율입니다."
       />
       <StatusMetric
         icon={<Trophy size={18} />}
@@ -481,6 +483,7 @@ function DashboardStrip({
         value={`${scorePercent}%`}
         detail={`${score.correct}/${score.total} correct`}
         tone="green"
+        hint="현재 트랙에서 정답 처리된 문항 수입니다. Learn 모드와 Focus 모드 결과가 함께 반영됩니다."
       />
       <StatusMetric
         icon={<Layers3 size={18} />}
@@ -488,6 +491,7 @@ function DashboardStrip({
         value={currentModule.shortTitle}
         detail={`${activeModuleScore.completed}/${activeModuleScore.total} completed · ${activeModulePercent}%`}
         tone="teal"
+        hint="지금 열려 있는 Skill Area의 진행 상태입니다. 왼쪽 모듈이나 아래 트랙에서 바로 이동할 수 있습니다."
       />
       <StatusMetric
         icon={mode === "focus" ? <Shuffle size={18} /> : <BookOpen size={18} />}
@@ -496,21 +500,47 @@ function DashboardStrip({
         detail={mode === "focus" ? "Assessment mode" : "Guided study"}
         tone="slate"
         onClick={onToggleMode}
+        hint="클릭하면 Guided study와 Assessment mode를 전환합니다."
       />
     </section>
   );
 }
 
-function StatusMetric({ icon, label, value, detail, tone, onClick }) {
+function StatusMetric({ icon, label, value, detail, tone, onClick, hint }) {
   const Element = onClick ? "button" : "div";
   return (
     <Element className={`status-metric ${tone} ${onClick ? "interactive" : ""}`} type={onClick ? "button" : undefined} onClick={onClick}>
       <span className="metric-icon">{icon}</span>
       <span className="metric-copy">
-        <span>{label}</span>
+        <span className="metric-label">
+          {label}
+          {hint && <InfoHint text={hint} />}
+        </span>
         <strong>{value}</strong>
         <small>{detail}</small>
       </span>
+      {hint && <span className="tutorial-popover">{hint}</span>}
+    </Element>
+  );
+}
+
+function InfoHint({ text }) {
+  return (
+    <span className="info-hint" tabIndex={0} aria-label={text}>
+      <CircleHelp size={14} />
+      <span className="hint-bubble" role="tooltip">{text}</span>
+    </span>
+  );
+}
+
+function RevealText({ text, as: Element = "span", className = "" }) {
+  return (
+    <Element className={`reveal-text ${className}`} aria-label={text}>
+      {[...text].map((char, index) => (
+        <span aria-hidden="true" key={`${char}-${index}`} style={{ "--i": index }}>
+          {char === " " ? "\u00a0" : char}
+        </span>
+      ))}
     </Element>
   );
 }
@@ -523,7 +553,13 @@ function ModuleOverview({ modules, activeModuleId, getModuleScore, onSelect }) {
         const percent = moduleScore.total ? Math.round((moduleScore.completed / moduleScore.total) * 100) : 0;
         const status = moduleScore.completed === moduleScore.total ? "done" : module.id === activeModuleId ? "current" : "ready";
         return (
-          <button className={`module-node ${status}`} key={module.id} type="button" title={module.title} onClick={() => onSelect(index)}>
+          <button
+            className={`module-node ${status}`}
+            key={module.id}
+            type="button"
+            title={module.title}
+            onClick={() => onSelect(index)}
+          >
             <span className="node-index">{index + 1}</span>
             <span className="node-copy">
               <strong>{module.shortTitle}</strong>
@@ -531,6 +567,9 @@ function ModuleOverview({ modules, activeModuleId, getModuleScore, onSelect }) {
             </span>
             <span className="node-bar" aria-hidden="true">
               <span style={{ width: `${percent}%` }} />
+            </span>
+            <span className="tutorial-popover">
+              {module.title}로 이동합니다. 막대는 해당 Skill Area에서 확인한 문항 비율입니다.
             </span>
           </button>
         );
@@ -567,7 +606,10 @@ function LaunchScreen({ saved, selectedIndex, onSelect }) {
           <span className="launch-mark">V</span>
           <div>
             <p className="eyebrow">VMware Skill Atlas</p>
-            <h1>{launchStep === "level" ? "VKS 역량 레벨을 선택하세요." : "VMware 역량 지도를 넓혀갑니다."}</h1>
+            <RevealText
+              as="h1"
+              text={launchStep === "level" ? "VKS 역량 레벨을 선택하세요." : "VMware 역량 지도를 넓혀갑니다."}
+            />
             <p>
               {launchStep === "level"
                 ? "Foundation, Implementation, Advanced 레벨을 따라 지식 확인과 실무형 체크를 진행합니다."
@@ -701,7 +743,10 @@ function PracticePanel({
       <div className="panel-heading inline-heading">
         <div>
           <p className="eyebrow">Practice</p>
-          <h3><Target size={20} /> 문제 풀이</h3>
+          <h3>
+            <Target size={20} /> 문제 풀이
+            <InfoHint text="선택형은 답을 고른 뒤 정답 확인을 누르고, 커맨드형은 명령어를 입력해 패턴을 검증합니다." />
+          </h3>
         </div>
         <div className="question-count">
           {currentNumber} / {totalNumber}
@@ -711,7 +756,7 @@ function PracticePanel({
       <div className="question-meta">
         <span>{mode === "focus" ? `${trackLabel} Focus Mode` : module.shortTitle}</span>
       </div>
-      <p className="question-text">{question.prompt}</p>
+      <RevealText key={question.prompt} as="p" text={question.prompt} className="question-text" />
 
       {question.type === "choice" ? (
         <div className="choice-list">

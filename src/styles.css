@@ -662,7 +662,6 @@ button:hover {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
-  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--line);
@@ -670,6 +669,7 @@ button:hover {
 }
 
 .status-metric {
+  position: relative;
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
   gap: 12px;
@@ -734,11 +734,18 @@ button:hover {
   gap: 2px;
 }
 
-.metric-copy span,
+.metric-label,
 .metric-copy small {
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
+}
+
+.metric-label {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
 }
 
 .metric-copy strong {
@@ -748,6 +755,78 @@ button:hover {
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.info-hint {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: #7b858f;
+  line-height: 0;
+}
+
+.info-hint svg {
+  flex: 0 0 auto;
+}
+
+.hint-bubble,
+.tutorial-popover {
+  position: absolute;
+  z-index: 20;
+  width: min(280px, 72vw);
+  padding: 10px 12px;
+  border: 1px solid #cdd6cf;
+  border-radius: 8px;
+  background: #20252d;
+  color: #f6f7f2;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: left;
+  box-shadow: 0 16px 38px rgba(32, 37, 45, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.hint-bubble {
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translate(-50%, 6px);
+}
+
+.info-hint:hover .hint-bubble,
+.info-hint:focus-visible .hint-bubble {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.tutorial-popover {
+  top: calc(100% + 10px);
+  right: 12px;
+}
+
+.status-metric:hover .tutorial-popover,
+.status-metric:focus-visible .tutorial-popover,
+.module-node:hover .tutorial-popover,
+.module-node:focus-visible .tutorial-popover {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-text {
+  display: block;
+}
+
+.reveal-text span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.55em);
+  animation: textCascade 420ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: calc(var(--i) * 18ms);
 }
 
 .hero-panel {
@@ -796,6 +875,7 @@ button:hover {
 }
 
 .module-node {
+  position: relative;
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr);
   grid-template-rows: auto auto;
@@ -1311,6 +1391,17 @@ code {
   }
 }
 
+@keyframes textCascade {
+  from {
+    opacity: 0;
+    transform: translateY(0.55em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes introLogo {
   0% {
     opacity: 0;
@@ -1331,6 +1422,22 @@ code {
   100% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+
+  .reveal-text span {
+    opacity: 1;
+    transform: none;
   }
 }
 
